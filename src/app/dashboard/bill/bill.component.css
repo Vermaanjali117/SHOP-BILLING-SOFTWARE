@@ -1,0 +1,131 @@
+/* ---------- Screen styles ---------- */
+#customer-copy,
+#kot {
+  background: #fff;
+  color: #000;
+  margin: 12px auto;
+  padding: 8px;
+  width: 300px; /* for screen preview */
+  max-width: 100%;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+#kot {
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 2px 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+.text-left   { text-align: left; }
+
+/* Buttons */
+#print-button-container {
+  margin-top: 16px;
+}
+#print-button-container button {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin: 0 4px;
+  cursor: pointer;
+}
+#print-button-container button:hover {
+  opacity: 0.9;
+}
+
+/* ---------- Print styles ---------- */
+@page {
+  size: 80mm auto;   /* thermal roll width */
+  margin: 0;         /* no printer/browser margins */
+}
+
+@media print {
+  html, body {
+    width: 80mm;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    color: #000;
+    font-size: 12px;
+    line-height: 1.1;  /* tighter line height */
+    font-family: Arial, sans-serif;
+  }
+
+  #customer-copy,
+  #kot {
+    width: 72mm;               /* safe width inside 80mm roll */
+    margin: 0 auto !important;
+    padding: 1mm 2mm;          /* very small padding */
+    box-sizing: border-box;
+    border-radius: 0;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    text-align: left;
+  }
+
+  /* customer copy ends before KOT */
+  #customer-copy {
+    page-break-after: always;
+  }
+
+  /* reset spacing for all text */
+  p, th, td, h3, h4 {
+    margin: 0;
+    padding: 0;
+    line-height: 1.1;
+  }
+
+  /* invoice info block compact */
+  .invoice-info p {
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  /* table compact */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 0;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  /* divider lines */
+  .divider,
+  p.text-\[11px\] {
+    margin: 2px 0;
+    line-height: 1;
+    text-align: center;
+  }
+  .divider::after,
+  p.text-\[11px\]::after {
+    content: "----------------------------------------";
+    display: block;
+  }
+
+  /* hide buttons on print */
+  #print-button-container,
+  .no-print {
+    display: none !important;
+  }
+}

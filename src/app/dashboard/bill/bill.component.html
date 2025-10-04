@@ -1,0 +1,100 @@
+<!-- Customer Invoice -->
+<div id="customer-copy" class="w-[300px] mx-auto text-black">
+  <!-- Company Header -->
+  <div class="text-center mb-2">
+    <h4 class="text-[18px] font-extrabold uppercase tracking-wide">
+      THE BELGIQUE BITES CO
+    </h4>
+    <p class="text-[13px] font-semibold">Annpurna Enterprise</p>
+    <p class="text-[11px] leading-tight max-w-[250px] mx-auto">
+      51-A Chandranagar Charari Lal<br />
+      Banglow, Kanpur - 208007
+    </p>
+    <p class="text-[11px] mt-1">--------------------------------------------------</p>
+  </div>
+
+  <!-- Invoice Info -->
+<div class="mb-2 text-[12px] invoice-info">
+  <p><b>Order No:</b> {{ order_detail.orderNumber }}</p>
+  <p><b>Token:</b> {{ order_detail.tokenNumber }}</p>
+  <p><b>Date:</b> {{ order_detail.date | date : "dd/MM/yyyy" }}</p>
+  <p><b>Customer:</b> {{ order_detail.customerName }}</p>
+  <p><b>Phone:</b> {{ order_detail.phone }}</p>
+  <p><b>Payment:</b> {{ order_detail.paymentMode }}</p>
+  <p><b>Order Type:</b> {{ order_detail.ordertype }}</p>
+</div>
+
+
+  <p class="text-[11px]">--------------------------------------------------</p>
+
+  <!-- Items -->
+  <table class="w-full text-[12px]">
+    <thead>
+      <tr>
+        <th class="text-left">Item</th>
+        <th class="text-center">Qty</th>
+        <th class="text-right">Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of order_items">
+        <td>{{ data.name }}</td>
+        <td class="text-center">{{ data.qty }}</td>
+        <td class="text-right">₹{{ data.price.toFixed(2) }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="text-[11px]">--------------------------------------------------</p>
+
+  <!-- Totals -->
+  <div class="text-[12px]">
+   
+    <p class="flex justify-between font-bold text-[13px] mt-1">
+      <span>Grand Total:</span>
+      <span>₹{{ order_detail?.grandTotal?.toFixed(2) }}</span>
+    </p>
+  </div>
+
+  <p class="text-[11px]">--------------------------------------------------</p>
+
+  <!-- ✅ Thank you message moved here -->
+  <div class="text-center mt-2 text-[11px] leading-tight">
+    <p>Thank you for your business!</p>
+    <p>Please visit again!</p>
+  </div>
+</div>
+
+<!-- Kitchen Order Ticket -->
+<div id="kot" class="w-[300px] mx-auto text-black mt-4">
+  <h3 class="font-bold text-[13px]">KOT (Kitchen Order Ticket)</h3>
+  <p><b>Token:</b> {{ order_detail.tokenNumber }}</p>
+  <p><b>Date:</b> {{ order_detail.date | date : "dd/MM/yyyy" }}</p>
+  <table class="w-full text-[12px] mt-1">
+    <thead>
+      <tr>
+        <th class="text-left">Item</th>
+        <th class="text-center">Qty</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of order_items">
+        <td>{{ data.name }}</td>
+        <td class="text-center">{{ data.qty }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="text-[11px]">--------------------------------------------------</p>
+</div>
+
+<!-- Print Buttons -->
+<div id="print-button-container" class="text-center mt-4">
+  <button (click)="printCustomer()" class="px-4 py-1 bg-black text-white rounded text-sm mr-2">
+    Print Customer Copy
+  </button>
+
+  <button (click)="printKOT()" class="px-4 py-1 bg-black text-white rounded text-sm">
+    Print KOT
+  </button>
+</div>

@@ -1,0 +1,262 @@
+<div class="flex h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-[#FFF8F0] text-[#5A4630] p-6 min-h-screen shadow-lg">
+    <h2 class="text-2xl font-semibold mb-8">POS Dashboard</h2>
+    <nav>
+      <ul class="space-y-4">
+        <li>
+          <a
+            routerLink="home"
+            routerLinkActive="font-semibold text-[#FFB347]"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="block px-4 py-2 rounded hover:bg-[#FFD8A6] transition-colors duration-200"
+          >
+            Home
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="items"
+            routerLinkActive="font-semibold text-[#FFB347]"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="block px-4 py-2 rounded hover:bg-[#FFD8A6] transition-colors duration-200"
+          >
+            Add Menu
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="invoice_list"
+            routerLinkActive="font-semibold text-[#FFB347]"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="block px-4 py-2 rounded hover:bg-[#FFD8A6] transition-colors duration-200"
+          >
+            Order List
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="sales_summary"
+            routerLinkActive="font-semibold text-[#FFB347]"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="block px-4 py-2 rounded hover:bg-[#FFD8A6] transition-colors duration-200"
+          >
+            Sales Summary
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <div class="flex-1 flex flex-col relative">
+    <!-- Header -->
+    <header class="bg-[#FFF1E6] shadow p-4 flex justify-between items-center">
+      <h1 class="text-lg font-semibold text-[#5A4630]">
+        The Belgique Bites Co
+      </h1>
+
+      <button
+        (click)="toggleCart()"
+        class="relative flex items-center bg-[#FFB347] text-[#5A4630] px-4 py-2 rounded-lg font-medium hover:bg-[#FFD8A6] transition-colors duration-200"
+      >
+        <!-- Cart Icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-5 h-5 mr-2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2.25 2.25h1.5l1.5 12.75h13.5l1.5-9H6.75"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 21a.75.75 0 100-1.5.75.75 0 000 1.5zM18 21a.75.75 0 100-1.5.75.75 0 000 1.5z"
+          />
+        </svg>
+        Cart
+
+        <!-- Badge -->
+        <span
+          *ngIf="showcartcount > 0"
+          class="absolute -top-2 -right-2 bg-[#FF6B6B] text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center"
+        >
+          {{ showcartcount }}
+        </span>
+      </button>
+    </header>
+
+    <!-- Dynamic content -->
+    <main class="flex-1 p-2 overflow-auto">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Cart Drawer -->
+    <!-- Cart Drawer -->
+    <!-- Cart Drawer -->
+    <!-- Cart Modal -->
+    <div
+      *ngIf="isCartOpen"
+      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+    >
+      <div
+        class="bg-[#f9f6f1] w-[560px] max-h-[90vh] rounded-2xl shadow-xl flex flex-col overflow-hidden"
+      >
+        <!-- Header -->
+        <div
+          class="flex justify-between items-center p-5 border-b border-gray-200"
+        >
+          <h2 class="text-lg font-semibold text-gray-800">
+            My Cart ({{ overalldata.length }} items)
+          </h2>
+          <button
+            (click)="closeCart()"
+            class="text-gray-500 hover:text-gray-800"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Cart Body -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+          <ng-container *ngIf="overalldata.length > 0; else emptyCart">
+            <!-- Cart Items -->
+            <div
+              *ngFor="let item of overalldata"
+              class="flex justify-between items-center border-b border-gray-300 pb-3"
+            >
+              <div>
+                <p class="font-medium text-gray-800">{{ item.name }}</p>
+                <p class="text-sm text-gray-500">₹{{ item.price }}</p>
+              </div>
+              <div
+                class="flex items-center border rounded-lg overflow-hidden bg-[#6b4e3d] text-white"
+              >
+                <button
+                  (click)="service.decreaseQuantity(item)"
+                  class="px-3 py-1 hover:bg-[#4e362b] transition"
+                >
+                  −
+                </button>
+                <span class="px-4 font-semibold">{{ item.quantity }}</span>
+                <button
+                  (click)="service.increaseQuantity(item)"
+                  class="px-3 py-1 hover:bg-[#4e362b] transition"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <!-- Customer Info -->
+            <div class="grid gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Customer Name</label
+                >
+                <input
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-[#a37e5c] focus:outline-none"
+                  placeholder="Enter customer name"
+                  [(ngModel)]="customerName"
+                  #usernameRef="ngModel"
+                  required
+                  minlength="3"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Phone</label
+                >
+                <input
+                  class="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-[#a37e5c] focus:outline-none"
+                  placeholder="Enter phone number"
+                  [(ngModel)]="customerPhone"
+                  #phoneRef="ngModel"
+                  required
+                  pattern="^[0-9]{10}$"
+                />
+              </div>
+
+              <!-- Payment & Order -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700"
+                    >Payment Mode</label
+                  >
+                  <ng-select
+                    [items]="payment_mode"
+                    bindLabel="value"
+                    bindValue="id"
+                    placeholder="Select Payment Mode"
+                    [(ngModel)]="paymentMode"
+                    #paymentRef="ngModel"
+                    required
+                    class="rounded-lg"
+                  >
+                  </ng-select>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700"
+                    >Order Type</label
+                  >
+                  <ng-select
+                    [items]="orderTypes"
+                    bindLabel="value"
+                    bindValue="id"
+                    placeholder="Select order type"
+                    [(ngModel)]="orderType"
+                    #orderRef="ngModel"
+                    required
+                    class="rounded-lg"
+                  >
+                  </ng-select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bill -->
+            <div class="bg-[#f3ede7] rounded-xl p-4 mt-4">
+              <div class="flex justify-between mb-2 text-gray-700">
+                <span>Items total</span>
+                <span class="font-medium">{{ this.service.itemtotal }}</span>
+              </div>
+              <div class="flex justify-between font-bold text-lg">
+                <span>Grand Total</span>
+                <span class="text-[#6b4e3d]">{{ this.service.itemtotal }}</span>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Empty Cart -->
+          <ng-template #emptyCart>
+            <div class="text-center text-gray-500 py-10">🛒 Cart is empty</div>
+          </ng-template>
+        </div>
+
+        <!-- Footer -->
+        <div
+          class="p-5 border-t border-gray-200"
+          *ngIf="overalldata.length > 0"
+        >
+          <button
+            [disabled]="
+              !customerName || !customerPhone || !paymentMode || !orderType
+            "
+            class="w-full bg-[#6b4e3d] hover:bg-[#4e362b] text-white py-3 rounded-xl font-semibold transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+            (click)="CreateInvoice()"
+          >
+            Create Invoice
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

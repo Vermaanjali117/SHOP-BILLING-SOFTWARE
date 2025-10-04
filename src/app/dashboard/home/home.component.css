@@ -1,0 +1,20 @@
+  /* hide scrollbars but keep scroll behavior */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* ensure long category names don't break layout (tailwind utilities used too) */
+  .text-ellipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  /* optional: subtle card focus outline for keyboard users */
+  .bg-white:focus-within {
+    outline: 2px solid rgba(163, 126, 92, 0.12);
+    outline-offset: 2px;
+  }

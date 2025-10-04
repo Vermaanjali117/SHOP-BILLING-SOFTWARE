@@ -1,0 +1,8 @@
+/* Smooth hide/show for sidebar */
+aside {
+  transition: all 0.3s ease-in-out;
+}
+button.disabled-btn {
+  cursor: not-allowed; /* shows prohibited sign */
+  opacity: 0.6;        /* visually looks disabled */
+}

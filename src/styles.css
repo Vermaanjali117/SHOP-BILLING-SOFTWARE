@@ -1,0 +1,175 @@
+/* You can add global styles to this file, and also import other style files */
+/* Add Tailwind's base, components, and utilities styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add your own custom global styles here */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+/* Base toast styles */
+.toast-container .ngx-toastr {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;         /* spacing between icon & text */
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  font-weight: 500;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Remove default background-image */
+.toast-success,
+.toast-error,
+.toast-info,
+.toast-warning {
+  background-image: none !important;
+}
+
+/* Success Toast */
+.toast-success {
+  background-color: #4e362b !important; /* theme brown */
+}
+.toast-success:before {
+  content: "✔";
+  font-size: 16px;
+  background: #fff;
+  color: #4e362b;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Error Toast */
+.toast-error {
+  background-color: #d32f2f !important; /* red */
+}
+.toast-error:before {
+  content: "✖";
+  font-size: 16px;
+  background: #fff;
+  color: #d32f2f;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Info Toast */
+.toast-info {
+  background-color: #1976d2 !important; /* blue */
+}
+.toast-info:before {
+  content: "ℹ";
+  font-size: 16px;
+  background: #fff;
+  color: #1976d2;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Warning Toast */
+.toast-warning {
+  background-color: #f57c00 !important; /* orange */
+}
+.toast-warning:before {
+  content: "⚠";
+  font-size: 16px;
+  background: #fff;
+  color: #f57c00;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+/* Make sure it only applies to your custom grid */
+.ag-theme-alpine.custom-grid {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+.ag-theme-alpine.custom-grid .ag-header {
+  background-color: #f9f6f1 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: #4e362b !important;
+  border-bottom: 2px solid #e0d6cf !important;
+}
+
+.ag-theme-alpine.custom-grid .ag-header-cell-label {
+  font-weight: 500;          /* lighter than bold */
+  font-size: 13px;           /* slightly smaller */
+  color: #4e362b;            /* softer brown tone (matches your theme) */
+  letter-spacing: 0.3px;     /* little spacing for elegance */
+}
+.ag-theme-alpine.custom-grid .ag-header {
+  background-color: #f9f6f1; /* soft beige background */
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Rows */
+.ag-theme-alpine.custom-grid .ag-row:nth-child(even) {
+  background-color: #faf7f3 !important;
+}
+.ag-theme-alpine.custom-grid .ag-row-hover {
+  background-color: #f1e9e2 !important;
+  cursor: pointer;
+}
+.ag-theme-alpine.custom-grid .ag-row-selected {
+  background-color: #e0d6cf !important;
+}
+
+/* Cells */
+.ag-theme-alpine.custom-grid .ag-cell {
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  color: #2c2c2c !important;
+  line-height: 1.4 !important;
+}
+
+/* Images */
+.ag-theme-alpine.custom-grid .ag-cell img {
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  transition: transform 0.2s ease;
+}
+.ag-theme-alpine.custom-grid .ag-cell img:hover {
+  transform: scale(1.1);
+}
+/* Center images inside ag-grid cells */
+.ag-theme-alpine.custom-grid .ag-cell {
+  display: flex;
+  align-items: center;   /* vertical center */
+  justify-content: center; /* horizontal center */
+}
+
+.ag-theme-alpine.custom-grid .ag-cell img {
+  height: 50px;
+  width: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
