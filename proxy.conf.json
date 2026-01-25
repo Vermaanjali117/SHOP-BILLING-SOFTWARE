@@ -1,7 +1,8 @@
 {
   "/api": {
-    "target": "http://localhost:3000",
-    "secure": false,
-    "changeOrigin": true
+    "target": "https://billing-backend-p45s.onrender.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

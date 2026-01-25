@@ -16,7 +16,7 @@ export class SalessummeryComponent implements OnInit, AfterViewInit {
   constructor(
     private service: SharedService,
     private el: ElementRef,
-    private loader: LoaderService
+    private loader: LoaderService,
   ) {}
   ngAfterViewInit(): void {}
   ngOnInit(): void {
@@ -25,20 +25,20 @@ export class SalessummeryComponent implements OnInit, AfterViewInit {
   }
   getsalesummery() {
     this.service.getsalessummery().subscribe((res: any) => {
-      this.chartdata = res;
-  
+      this.chartdata = res.sales;
       for (let i = 0; i < this.chartdata.length; i++) {
-        this.date.push(res[i]._id);
-        this.totalsale.push(res[i].totalSales);
-        this.ordercount.push(res[i].orderCount);
+        this.date.push(this.chartdata[i]._id);
+        this.totalsale.push(this.chartdata[i].totalSales);
+        this.ordercount.push(this.chartdata[i].orderCount);
       }
     });
     setTimeout(() => {
       this.getchartdata();
-          this.loader.hide();
+      this.loader.hide();
     }, 3000);
   }
   getchartdata() {
+
     // ✅ Find the div inside this component
     const chartDom = this.el.nativeElement.querySelector('#main');
     const myChart = echarts.init(chartDom);
@@ -78,10 +78,10 @@ export class SalessummeryComponent implements OnInit, AfterViewInit {
       formatter: (params: any) => {
         const date = params[0].axisValue; // x-axis (date)
         const amount = params.find(
-          (p: any) => p.seriesName === 'total sale'
+          (p: any) => p.seriesName === 'total sale',
         )?.data;
         const orders = params.find(
-          (p: any) => p.seriesName === 'Order Count'
+          (p: any) => p.seriesName === 'Order Count',
         )?.data;
         return `
         Date: ${date}<br/>

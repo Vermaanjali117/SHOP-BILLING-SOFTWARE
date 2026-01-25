@@ -1,98 +1,93 @@
-<body class="mt-4 mb-4">
-  <!-- Top bar with Add Menu (left) and Search (right) -->
-  <div class="flex items-center justify-between mb-4">
-    <!-- Add Menu Button -->
-    <button class="bg-[#6b4e3d] text-white hover:bg-[#4e362b] font-medium py-2 px-4 rounded-lg shadow-sm transition"
-      (click)="openModal()">
-      Add Menu
-    </button>
+<body class="p-2 bg-gray-50 min-h-screen">
+  <div class="flex items-center justify-between mb-1">
+    <div>
+      <h1 class="text-xl font-bold text-gray-700">Menu Management</h1>
+      <p class="text-sm text-gray-500">
+        Manage your items, prices, and categories
+      </p>
+    </div>
+    <div class="flex gap-3">
+     <input
+  type="text"
+  placeholder="Search menu..."
+  (input)="onQuickFilterChanged($event)"
+  class="h-9 w-64 px-3 text-sm border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#6b4e3d]/20 focus:border-[#6b4e3d] bg-white outline-none transition-all placeholder:text-gray-400"
+/>
 
-    <!-- Search Input -->
-    <input type="text" placeholder="Search..." (input)="onQuickFilterChanged($event)"
-      class="p-2 w-64 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#a37e5c] bg-white" />
+<button
+  class="bg-[#6b4e3d] text-white hover:bg-[#5a4133] font-bold py-1.5 px-4 rounded-lg shadow-md shadow-[#6b4e3d]/10 transition-all flex items-center gap-1.5 text-sm"
+  (click)="openModal()"
+>
+  <span class="text-base leading-none">+</span> 
+  Add Menu
+</button>
+    </div>
   </div>
 
-  <!-- Table -->
-  <ag-grid-angular (gridReady)="onGridReady($event)" class="ag-theme-alpine" style="width: 100%; height: 400px"
-    [rowData]="rowData" [columnDefs]="columnDefs" [pagination]="true" [paginationPageSize]="10"
-    class="ag-theme-alpine custom-grid">
-  </ag-grid-angular>
+  <div class="bg-white rounded-2xl p-2 shadow-sm border border-gray-100">
+    <ag-grid-angular
+      (gridReady)="onGridReady($event)"
+      style="width: 100%; height: 500px"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [pagination]="true"
+      [paginationPageSize]="10"
+      class="ag-theme-alpine custom-grid"
+    >
+    </ag-grid-angular>
+  </div>
 
-  <div *ngIf="isModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-[#f9f6f1] rounded-2xl shadow-xl w-96 p-4 relative">
-      <!-- Header -->
-      <h3 class="text-lg font-bold mb-4 text-[#4e362b]">
-        {{ isEdit ? "Edit" : "Add" }}
-      </h3>
-
-      <!-- Form -->
-      <form class="space-y-3" #menuform="ngForm" (ngSubmit)="onSubmit(menuform)">
-        <!-- Item Name -->
-        <div>
-          <label for="name" class="block text-sm font-medium text-gray-700">
-            Item Name <span class="text-danger">*</span>
-          </label>
-          <input type="text" [(ngModel)]="name" id="name" name="name"
-            class="mt-0.5 block w-full rounded-lg border border-gray-300 shadow-sm p-2 bg-white focus:ring-2 focus:ring-[#a37e5c] focus:outline-none"
-            placeholder="e.g., Waffle" required #nameRef="ngModel" />
-          <div class="text-danger1" *ngIf="nameRef.invalid && nameRef.touched">required</div>
-        </div>
-
-        <!-- Category -->
-        <div>
-          <label for="category" class="block text-sm font-medium text-gray-700">
-            Category<span class="text-danger">*</span>
-          </label>
-          <input type="text" id="category" [(ngModel)]="category" name="category"
-            class="mt-0.5 block w-full rounded-lg border border-gray-300 shadow-sm p-2 bg-white focus:ring-2 focus:ring-[#a37e5c]"
-            placeholder="e.g., Cheesecake" required #CategoryRef="ngModel" />
-          <div class="text-danger1" *ngIf="CategoryRef.invalid && CategoryRef.touched">required</div>
-        </div>
-
-        <!-- Price -->
-        <div>
-          <label for="price" class="block text-sm font-medium text-gray-700">
-            Price<span class="text-danger">*</span>
-          </label>
-          <input type="number" [(ngModel)]="price" id="price" name="price"
-            class="mt-0.5 block w-full rounded-lg border border-gray-300 shadow-sm p-2 bg-white focus:ring-2 focus:ring-[#a37e5c]"
-            placeholder="e.g., 120.50" required #priceRef="ngModel" />
-          <div class="text-danger1" *ngIf="priceRef.invalid && priceRef.touched">required</div>
-        </div>
-
-        <!-- Image -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Image<span class="text-danger">*</span></label>
-          <input type="file" (change)="onFileSelected($event)" accept="image/*" [(ngModel)]="imageurl" name="filename"
-            class="mt-0.5 block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none"
-            #imageRef="ngModel" />
-          <div class="text-danger1" *ngIf="imageRef.invalid && imageRef.touched">required</div>
-        </div>
-
-        <!-- Description -->
-        <div>
-          <label for="description" class="block text-sm font-medium text-gray-700">
-            Description<span class="text-danger">*</span>
-          </label>
-          <textarea id="description" [(ngModel)]="description" name="description" rows="3"
-            class="mt-0.5 block w-full rounded-lg border border-gray-300 shadow-sm p-2 bg-white focus:ring-2 focus:ring-[#a37e5c]"
-            placeholder="A brief description of the item." required #descRef="ngModel"></textarea>
-          <div class="text-danger1" *ngIf="descRef.invalid && descRef.touched">required</div>
-        </div>
-
-        <!-- Submit Button -->
-        <div>
-          <button type="submit"
-            class="w-full py-2.5 rounded-xl text-white font-semibold bg-[#6b4e3d] hover:bg-[#4e362b] shadow-md transition">
-            {{ isEdit ? "Edit" : "Add" }}
-          </button>
-        </div>
-      </form>
-
-      <!-- Close Button -->
-      <button class="absolute top-2 right-2 text-gray-500 hover:text-[#6b4e3d] transition" (click)="closeModal()">
+<div *ngIf="isModalOpen" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
+    
+    <div class="bg-[#6b4e3d] p-3 text-white flex justify-between items-center">
+      <h3 class="text-base font-bold">{{ isEdit ? "Edit Item" : "New Item" }}</h3>
+      <button (click)="closeModal()" class="hover:bg-white/20 px-2 py-1 rounded-md text-sm transition">
         ✕
       </button>
     </div>
+
+    <form class="p-4 space-y-2.5" #menuform="ngForm" (ngSubmit)="onSubmit(menuform)" autocomplete="off">
+      
+      <div>
+        <label class="form-label">Item Name</label>
+        <input type="text" [(ngModel)]="name" name="name" class="form-input" placeholder="e.g. Strawberry Waffle" required autocomplete="off" />
+      </div>
+
+      <div class="flex gap-3">
+        <div class="flex-1">
+          <label class="form-label">Category</label>
+          <input type="text" [(ngModel)]="category" name="category" class="form-input" placeholder="Cheesecake" required autocomplete="off" />
+        </div>
+        <div class="w-24">
+          <label class="form-label">Price</label>
+          <input type="number" [(ngModel)]="price" name="price" class="form-input" placeholder="0.00" required autocomplete="off" />
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label">Description</label>
+        <textarea [(ngModel)]="description" name="description" rows="2" class="form-input resize-none" placeholder="Brief details..."></textarea>
+      </div>
+
+      <div class="flex items-center gap-3 pt-1">
+        <div class="h-10 w-10 rounded border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+          <img *ngIf="selectedImage || imageurl" [src]="selectedImage || imageurl" class="h-full w-full object-cover">
+          <span *ngIf="!selectedImage && !imageurl" class="text-[8px] text-gray-400">No Image</span>
+        </div>
+        <div class="flex-1">
+          <label class="form-label">Image</label>
+          <label class="cursor-pointer bg-gray-100 border border-gray-300 px-2 py-1 rounded text-[11px] font-bold hover:bg-gray-200 transition inline-block">
+            Choose File
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" />
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full py-2 mt-2 rounded-lg text-white font-bold bg-[#6b4e3d] hover:bg-[#5a4133] shadow-md transition-all active:scale-[0.98]">
+        {{ isEdit ? "Update Item" : "Add to Menu" }}
+      </button>
+    </form>
   </div>
+</div>
 </body>

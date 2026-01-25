@@ -7,9 +7,13 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
 import { AgGridModule } from 'ag-grid-angular';
 import { RouterModule } from '@angular/router';
 
-import { SalessummeryComponent } from './salessummery/salessummery.component'; // 👈 important
+import { SalessummeryComponent } from './salessummery/salessummery.component';
+import { RowMaterialComponent } from './row-material/row-material.component';
+import { AddRecipeComponent } from './add-recipe/add-recipe.component';
+import { InventoryHistoryComponent } from './inventory-history/inventory-history.component';
+
 @NgModule({
-  declarations: [ SalessummeryComponent],
+  declarations: [ SalessummeryComponent, RowMaterialComponent, AddRecipeComponent, InventoryHistoryComponent,],
   imports: [CommonModule, FormsModule, DashboardRoutingModule, RouterModule,
     AgGridModule 
   ],

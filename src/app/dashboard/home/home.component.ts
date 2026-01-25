@@ -33,7 +33,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loader.show()
     this.getlist();
-    this.cartservice.showcartdata$.subscribe((data: any) => {
+    this.cartservice.showcartdata$.subscribe((data:any)=>{
       this.cart = data;
     });
     this.show_product = [...this.getlistdata];
@@ -59,7 +59,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.showproduct = this.getlistdata.filter(
       (p: any) => p.category === this.selectedCategory
     );
-    console.log("this.showproduct ========",this.showproduct);
     return this.showproduct;
   }
 
@@ -95,7 +94,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   getlist() {
-    this.service.getlistpost().subscribe((res: any) => {
+    this.service.getlistpost().subscribe((res:any)=>{
       if (res.status == 'success') {
         this.getlistdata = res.data;
        // Extract unique categories
@@ -112,7 +111,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         // Show all products by default
         this.showproduct = this.getlistdata;
-        console.log("this.showproduct =====",this.showproduct);
       }
     });
     this.loader.hide();

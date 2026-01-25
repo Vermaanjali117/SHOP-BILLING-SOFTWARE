@@ -54,4 +54,11 @@ export class CartService {
     );
     console.log('this.itemtotal ===', this.itemtotal);
   }
+  // inside CartService
+  clearCart() {
+    this.cart = [];
+    this.itemtotal = 0;
+    // emit the empty array to subscribers
+    this.notify();
+  }
 }

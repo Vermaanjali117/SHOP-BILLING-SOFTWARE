@@ -1,82 +1,89 @@
-<div class="p-4">
-  <!-- Header -->
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-[#4e362b]">Order Track</h2>
-    <input
-      (input)="onSearchChange($event)"
-      type="text"
-      placeholder="Search menu here..."
-      class="px-4 py-2 rounded-xl border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#a37e5c]"
-    />
+<div class="min-h-screen bg-[#faf9f6] p-3 md:p-3">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+    <div>
+      <h3 class="text-2xl font-extrabold text-[#4e362b] tracking-tight">Order Track</h3>
+      <p class="text-sm text-[#a37e5c] font-medium italic">Deliciousness delivered to your track.</p>
+    </div>
+    
+    <div class="relative w-full md:w-80 shadow-sm rounded-2xl overflow-hidden">
+      <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      </span>
+      <input
+        (input)="onSearchChange($event)"
+        type="text"
+        placeholder="Search menu here..."
+        class="w-full pl-10 pr-4 py-2 border-none bg-white focus:ring-2 focus:ring-[#a37e5c] transition-all outline-none"
+      />
+    </div>
   </div>
 
-  <!-- Categories -->
- <div class="mb-4">
-    <div class="flex gap-2 overflow-x-auto py-1 px-1 scrollbar-hide">
+  <div class="mb-8">
+    <div class="flex flex-wrap gap-3">
       <button
         *ngFor="let category of catagory"
         (click)="selectCategory(category)"
         [ngClass]="{
-          'bg-[#6b4e3d] text-white': selectedCategory === category,
-          'bg-[#f3ede7] text-[#4e362b]': selectedCategory !== category
+          'bg-[#6b4e3d] text-white shadow-md scale-105': selectedCategory === category,
+          'bg-white text-[#4e362b] border-gray-200 hover:bg-[#f3ede7]': selectedCategory !== category
         }"
-        class="flex-shrink-0 px-4 py-2 rounded-full font-medium whitespace-nowrap transition-all max-w-[160px] truncate"
+        class="px-2 py-2 rounded-xl font-bold transition-all border border-transparent text-sm md:text-base"
       >
         {{ category }}
       </button>
     </div>
   </div>
 
-  <!-- Product Grid -->
-  <div
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-  >
-    <div *ngFor="let product of showproduct">
-      <div
-        *ngIf="product.category"
-        class="bg-white rounded-2xl shadow-md overflow-hidden relative border border-gray-200 hover:shadow-lg transition"
-      >
-        <!-- Product Image -->
-        <img
-          [src]="product.image"
-          alt="{{ product.name }}"
-          class="w-full h-40 object-cover"
-        />
-
-        <!-- Product Details -->
-        <div class="p-4">
-          <h3 class="text-md font-semibold text-gray-800 truncate">
-            {{ product.name }}
-          </h3>
-          <p class="text-sm text-gray-500">{{product.decription}}</p>
-          <p class="text-lg font-bold text-[#6b4e3d] mt-2">
-            ₹{{ product.price }}
-          </p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+    <div *ngFor="let product of showproduct" class="group">
+      <div *ngIf="product.category" 
+           class="bg-white rounded-[2rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 transform group-hover:-translate-y-2 flex flex-col h-full">
+        
+        <div class="relative aspect-[4/3] bg-gray-50 overflow-hidden shrink-0">
+          <img
+            [src]="product.image"
+            (error)="product.image = 'https://placehold.co/600x450?text=Delicious+Food'"
+            alt="{{ product.name }}"
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+          <div class="absolute top-4 left-4">
+             <span class="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-[#6b4e3d] shadow-sm">
+                Best Seller
+             </span>
+          </div>
         </div>
 
-        <!-- Add / Counter button -->
-        <div class="absolute bottom-4 right-4">
-          <!-- ADD button -->
-          <button
-            *ngIf="getQuantity(product) === 0"
-            (click)="addToCart(product)"
-            class="px-4 py-1 text-white bg-[#6b4e3d] rounded-full hover:bg-[#4e362b] font-semibold shadow-sm transition"
-          >
-            ADD
-          </button>
+        <div class="p-3 flex flex-col flex-grow">
+          <div class="mb-2">
+            <h3 class="text-lg font-bold text-gray-800 leading-tight mb-2 truncate">
+              {{ product.name }}
+            </h3>
+            <p class="text-xs text-gray-500 line-clamp-2">
+              {{ product.decription || 'Authentic flavors made with fresh ingredients for a delightful experience.' }}
+            </p>
+          </div>
+          
+          <div class="mt-auto flex justify-between items-center">
+            <span class="text-xl font-black text-[#4e362b]">₹{{ product.price }}</span>
+            
+            <div class="min-w-[100px] flex justify-end">
+              <button
+                *ngIf="getQuantity(product) === 0"
+                (click)="addToCart(product)"
+                class="px-6 py-2 text-xs font-black text-white bg-[#6b4e3d] rounded-xl hover:bg-[#4e362b] transition-all shadow-md active:scale-95"
+              >
+                ADD
+              </button>
 
-          <!-- Counter -->
-          <div
-            *ngIf="getQuantity(product) > 0"
-            class="flex items-center bg-[#6b4e3d] text-white px-3 py-1 rounded-full shadow-sm space-x-2"
-          >
-            <button (click)="decreaseQuantity(product)" class="font-bold">
-              −
-            </button>
-            <span>{{ getQuantity(product) }}</span>
-            <button (click)="increaseQuantity(product)" class="font-bold">
-              +
-            </button>
+              <div
+                *ngIf="getQuantity(product) > 0"
+                class="flex items-center bg-[#6b4e3d] text-white p-1 rounded-xl shadow-lg gap-3"
+              >
+                <button (click)="decreaseQuantity(product)" class="w-7 h-7 flex items-center justify-center hover:bg-white/20 rounded-lg font-bold"> − </button>
+                <span class="font-bold text-sm min-w-[1.5ch] text-center">{{ getQuantity(product) }}</span>
+                <button (click)="increaseQuantity(product)" class="w-7 h-7 flex items-center justify-center hover:bg-white/20 rounded-lg font-bold"> + </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

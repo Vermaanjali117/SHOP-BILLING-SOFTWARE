@@ -163,7 +163,7 @@ body {
 .ag-theme-alpine.custom-grid .ag-cell {
   display: flex;
   align-items: center;   /* vertical center */
-  justify-content: center; /* horizontal center */
+  /* justify-content: center; horizontal center */
 }
 
 .ag-theme-alpine.custom-grid .ag-cell img {
@@ -172,4 +172,384 @@ body {
   object-fit: cover;
   border-radius: 6px;
   border: 1px solid #ddd;
+}
+/* ===== Inventory History Styling ===== */
+
+/* Zebra rows */
+.ag-theme-alpine .ag-row:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Hover */
+.ag-theme-alpine .ag-row:hover {
+  background-color: #eef6ff !important;
+}
+
+/* Stock change */
+.ag-theme-alpine .stock-in {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.ag-theme-alpine .stock-out {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+/* Row type coloring */
+.ag-theme-alpine .row-restock {
+  border-left: 5px solid #22c55e;
+  background-color: #f0fdf4;
+}
+
+.ag-theme-alpine .row-order {
+  border-left: 5px solid #ef4444;
+  background-color: #fff1f2;
+}
+
+.ag-theme-alpine .row-adjustment {
+  border-left: 5px solid #f59e0b;
+  background-color: #fffbeb;
+}
+
+/* Reason badge */
+.reason-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-restock {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-order {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-adjust {
+  background: #fef3c7;
+  color: #92400e;
+}
+/* ================================
+   Inventory History Typography
+================================ */
+
+/* Header */
+.ag-theme-alpine .ag-header-cell-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Table rows */
+.ag-theme-alpine .ag-cell {
+  font-size: 13px;
+  color: #111827;
+  line-height: 1.4;
+}
+
+/* Raw material name */
+.ag-theme-alpine .ag-cell[col-id="rawMaterial"] {
+  font-weight: 500;
+}
+
+/* Quantity change */
+.ag-theme-alpine .stock-in,
+.ag-theme-alpine .stock-out {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+
+/* Reason badge */
+.reason-badge {
+  font-size: 11.5px;
+  padding: 5px 12px;
+  font-weight: 600;
+}
+
+/* Date column */
+.ag-theme-alpine .ag-cell[col-id="createdAt"] {
+  font-size: 12.5px;
+  color: #6b7280;
+}
+
+/* Pagination text */
+.ag-theme-alpine .ag-paging-panel {
+  font-size: 12.5px;
+}
+
+/* Checkbox alignment */
+.ag-theme-alpine .ag-selection-checkbox {
+  transform: scale(0.95);
+}
+.ag-theme-alpine .stock-out {
+  color: #991b1b;
+}
+.ag-theme-alpine .stock-in {
+  color: #065f46;
+}
+.pos-change {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.neg-change {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.reason-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-restock {
+  background: #e6f7ee;
+  color: #1d9d74;
+}
+
+.badge-order {
+  background: #fdeaea;
+  color: #d93025;
+}
+
+.badge-adjust {
+  background: #fff5e6;
+  color: #f29900;
+}
+/* Zebra rows */
+.ag-row:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Hover effect */
+.ag-row:hover {
+  background-color: #eef6ff !important;
+  transition: 0.2s;
+}
+
+/* Stock change colors */
+.stock-in {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.stock-out {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+/* Row background indicators */
+.row-restock {
+  border-left: 4px solid #22c55e;
+  background-color: #f0fdf4;
+}
+
+.row-order {
+  border-left: 4px solid #ef4444;
+  background-color: #fff1f2;
+}
+
+.row-adjustment {
+  border-left: 4px solid #f59e0b;
+  background-color: #fffbeb;
+}
+
+/* Reason pill */
+.reason-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.badge-restock {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-order {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-adjust {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Checkbox alignment */
+.ag-selection-checkbox {
+  transform: scale(1.1);
+}
+/* ================================
+   Inventory History Typography
+================================ */
+
+/* Header */
+.ag-theme-alpine .ag-header-cell-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Table rows */
+.ag-theme-alpine .ag-cell {
+  font-size: 13px;
+  color: #111827;
+  line-height: 1.4;
+}
+
+/* Raw material name */
+.ag-theme-alpine .ag-cell[col-id="rawMaterial"] {
+  font-weight: 500;
+}
+
+/* Quantity change */
+.ag-theme-alpine .stock-in,
+.ag-theme-alpine .stock-out {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+
+/* Reason badge */
+.reason-badge {
+  font-size: 11.5px;
+  padding: 5px 12px;
+  font-weight: 600;
+}
+
+/* Date column */
+.ag-theme-alpine .ag-cell[col-id="createdAt"] {
+  font-size: 12.5px;
+  color: #6b7280;
+}
+
+/* Pagination text */
+.ag-theme-alpine .ag-paging-panel {
+  font-size: 12.5px;
+}
+
+/* Checkbox alignment */
+.ag-theme-alpine .ag-selection-checkbox {
+  transform: scale(0.95);
+}
+/* ============================
+   AG GRID BASE
+============================ */
+
+.custom-grid {
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+/* Header */
+.custom-grid .ag-header {
+  background: #faf7f3;
+  border-bottom: 1px solid #e6d9cc;
+}
+
+.custom-grid .ag-header-cell-text {
+  font-weight: 600;
+  font-size: 14px;
+  color: #5a3e2b;
+}
+
+/* Rows */
+.custom-grid .ag-row {
+  font-size: 14px;
+  height: 48px !important;
+}
+
+.custom-grid .ag-cell {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+/* Zebra rows */
+.custom-grid .ag-row:nth-child(even) {
+  background: #fafafa;
+}
+
+/* Hover */
+.custom-grid .ag-row-hover {
+  background: #f3ede7 !important;
+}
+
+/* ============================
+   STOCK COLORS
+============================ */
+
+.stock-in {
+  color: #1a7f37;
+  font-weight: 600;
+}
+
+.stock-out {
+  color: #c62828;
+  font-weight: 600;
+}
+
+/* ============================
+   BADGES
+============================ */
+
+.reason-badge {
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-restock {
+  background: #e8f7ee;
+  color: #1a7f37;
+}
+
+.badge-order {
+  background: #fdeaea;
+  color: #c62828;
+}
+
+.badge-adjust {
+  background: #fff4dd;
+  color: #b26a00;
+}
+
+/* ============================
+   ROW HIGHLIGHT
+============================ */
+
+/* .row-restock {
+  border-left: 4px solid #2ecc71;
+}
+
+.row-order {
+  border-left: 4px solid #e74c3c;
+}
+
+.row-adjustment {
+  border-left: 4px solid #f39c12;
+} */
+
+/* ============================
+   PAGINATION
+============================ */
+
+.custom-grid .ag-paging-panel {
+  background: #faf7f3;
+  border-top: 1px solid #e6d9cc;
+  font-size: 13px;
 }

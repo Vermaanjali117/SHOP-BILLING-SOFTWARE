@@ -19,7 +19,7 @@ export class CustomerComponent implements OnInit {
   constructor(
     public service: SharedService,
     public loader: LoaderService,
-    public toast: ToastrService
+    public toast: ToastrService,
   ) {}
   columnDefs: any;
   orderlist: any = [];
@@ -28,7 +28,6 @@ export class CustomerComponent implements OnInit {
   ngOnInit(): void {
     this.loader.show();
     this.service.getbilllist().subscribe((res: any) => {
-      console.log('response ====', res);
       this.orderlist = res.orders;
       this.getorderlist();
     });
@@ -79,13 +78,13 @@ export class CustomerComponent implements OnInit {
         sortable: false,
         filter: false,
       },
-            {
+      {
         headerName: 'Delete',
         cellRenderer: (params: any) => {
           const button = document.createElement('button');
           button.className =
-      'flex items-center justify-center text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 rounded-full w-8 h-8 transition';
-    button.innerHTML = `
+            'flex items-center justify-center text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 rounded-full w-8 h-8 transition';
+          button.innerHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path d="M6 18L18 6M6 6l12 12" />
       </svg>
@@ -107,24 +106,26 @@ export class CustomerComponent implements OnInit {
   }
 
   getorderdetail(params: any) {
-    this.showbillreciept = !this.showbillreciept;
-    console.log(' params.data ===', params.data);
+    this.showbillreciept = true;
     this.order_detail = params.data;
     this.order_items = params.data.items;
-    console.log('this.order_detail ====', this.order_detail);
   }
+
   closeModal() {
-    this.showbillreciept = !this.showbillreciept;
+    this.showbillreciept = false;
   }
-  deleteorder(data:any){
-    
-          this.loader.show()
+  deleteorder(data: any) {
+    this.loader.show();
     alert('Are you sure you want to delete ' + data.orderNumber);
     const id = data._id;
     this.service.deleteorder(id).subscribe((res: any) => {
-     this.toast.success(data.orderNumber+" deleted successfully")
+      this.toast.success(data.orderNumber + ' deleted successfully');
       this.getorderlist();
     });
-    this.loader.hide()
+    this.service.getbilllist().subscribe((res: any) => {
+      this.orderlist = res.orders;
+      this.getorderlist();
+    });
+    this.loader.hide();
   }
 }

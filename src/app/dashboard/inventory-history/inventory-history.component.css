@@ -1,0 +1,150 @@
+/* ============================================================
+   INVENTORY HISTORY GRID CUSTOM STYLES
+   Note: !important is used to override ag-Grid theme defaults.
+============================================================ */
+
+/* Base Grid Styling */
+.custom-grid {
+  font-family: "Inter", "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  border-radius: 10px !important;
+}
+
+/* Header Styling */
+.custom-grid .ag-header,
+.ag-theme-alpine .ag-header {
+  background: #faf7f3 !important;
+  border-bottom: 1px solid #e6d9cc !important;
+}
+
+.custom-grid .ag-header-cell-text,
+.ag-theme-alpine .ag-header-cell-label {
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: #5a3e2b !important;
+}
+
+/* Row & Cell Basics */
+.custom-grid .ag-row,
+.ag-theme-alpine .ag-row {
+  font-size: 14px !important;
+  height: 48px !important;
+}
+
+.custom-grid .ag-cell,
+.ag-theme-alpine .ag-cell {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 12px !important;
+  font-size: 13px !important;
+  color: #111827 !important;
+  line-height: 1.4 !important;
+}
+
+/* Zebra Striping */
+.ag-row:nth-child(even),
+.custom-grid .ag-row:nth-child(even) {
+  background-color: #fafafa !important;
+}
+
+/* Hover Effect */
+.ag-row:hover,
+.ag-row-hover,
+.custom-grid .ag-row-hover {
+  background-color: #eef6ff !important;
+  transition: 0.2s !important;
+}
+
+/* ============================
+   STOCK CHANGE INDICATORS
+============================ */
+
+.stock-in, .pos-change {
+  color: #16a34a !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  letter-spacing: 0.2px !important;
+}
+
+.stock-out, .neg-change {
+  color: #dc2626 !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  letter-spacing: 0.2px !important;
+}
+
+/* ============================
+   REASON BADGES (PILLS)
+============================ */
+
+.reason-badge {
+  padding: 5px 12px !important;
+  border-radius: 999px !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  letter-spacing: 0.4px !important;
+}
+
+.badge-restock {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.badge-order {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+.badge-adjust {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+/* ============================
+   ROW BORDER HIGHLIGHTS
+============================ */
+
+.row-restock {
+  border-left: 4px solid #22c55e !important;
+  background-color: #f0fdf4 !important;
+}
+
+.row-order {
+  border-left: 4px solid #ef4444 !important;
+  background-color: #fff1f2 !important;
+}
+
+.row-adjustment {
+  border-left: 4px solid #f59e0b !important;
+  background-color: #fffbeb !important;
+}
+
+/* ============================
+   UTILITIES & PAGINATION
+============================ */
+
+/* Column Specifics */
+.ag-theme-alpine .ag-cell[col-id="rawMaterial"] {
+  font-weight: 500 !important;
+}
+
+.ag-theme-alpine .ag-cell[col-id="createdAt"] {
+  font-size: 12.5px !important;
+  color: #6b7280 !important;
+}
+
+/* Pagination */
+.custom-grid .ag-paging-panel,
+.ag-theme-alpine .ag-paging-panel {
+  background: #faf7f3 !important;
+  border-top: 1px solid #e6d9cc !important;
+  font-size: 12.5px !important;
+}
+
+/* Checkbox Scale */
+.ag-selection-checkbox {
+  transform: scale(1.1) !important;
+}

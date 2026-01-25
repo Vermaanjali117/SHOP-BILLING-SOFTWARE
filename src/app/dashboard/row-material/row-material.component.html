@@ -1,0 +1,160 @@
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h3 style="font-weight: 600; color: #0f172a; margin: 0">
+    Inventory Management
+  </h3>
+  <button class="btn btn-primary px-4 py-2 shadow-sm" (click)="openModal()">
+    + Add Raw Material
+  </button>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <ag-grid-angular
+    style="width: 100%; height: 500px"
+    class="ag-theme-alpine custom-grid"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    (gridReady)="onGridReady($event)"
+    [suppressHorizontalScroll]="false"
+  >
+  </ag-grid-angular>
+</div>
+
+<ng-container *ngIf="showModal">
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="custom-modal">
+    <div class="modal-box">
+      <h5>{{ raw_material_isEdit ? "Edit" : "Add New" }} Raw Material</h5>
+      <form (ngSubmit)="saveRawMaterial(f)" #f="ngForm">
+        <div class="mb-3">
+          <label class="form-label">Material Name</label>
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            [(ngModel)]="rawMaterial.name"
+            placeholder="Enter Row Material"
+            required
+          />
+        </div>
+
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label class="form-label">Unit</label>
+            <select
+              class="form-select"
+              name="unit"
+              [(ngModel)]="rawMaterial.unit"
+              required
+            >
+              <option value="">Select unit</option>
+              <option value="gm">Gram</option>
+              <option value="ml">ML</option>
+              <option value="pcs">Pieces</option>
+            </select>
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label">Low Stock Alert</label>
+            <input
+              type="number"
+              class="form-control"
+              name="alertAt"
+              placeholder="Enter quantity"
+              [(ngModel)]="rawMaterial.alertAt"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="mb-4" *ngIf="!raw_material_isEdit">
+          <label class="form-label">Initial Quantity</label>
+          <input
+            type="number"
+            class="form-control"
+            name="quantity"
+            placeholder="Enter quantity"
+            [(ngModel)]="rawMaterial.quantity"
+            required
+          />
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 pt-3">
+          <button type="button" class="btn btn-light" (click)="closeModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-success px-4"
+            [disabled]="f.invalid"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="showAddStockModal">
+  <div class="modal-backdrop" (click)="closeAddStockModal()"></div>
+  <div class="custom-modal">
+    <div class="modal-box">
+      <h5>
+        Add Stock <small class="text-muted">({{ row_material_name }})</small>
+      </h5>
+      <div class="mb-4">
+        <label class="form-label">Quantity to Add</label>
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="addStockQty"
+          placeholder="0"
+        />
+      </div>
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-light" (click)="closeAddStockModal()">
+          Cancel
+        </button>
+        <button
+          class="btn btn-success px-4"
+          [disabled]="!addStockQty || addStockQty <= 0"
+          (click)="submitAddStock()"
+        >
+          Confirm Add
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="showAdjustModal">
+  <div class="modal-backdrop" (click)="closeAdjustStockModal()"></div>
+  <div class="custom-modal">
+    <div class="modal-box">
+      <h5>
+        Adjust Stock
+        <small class="text-muted">({{ selectedMaterial?.name }})</small>
+      </h5>
+      <div class="mb-3">
+        <label class="form-label">Physical Count (New Total)</label>
+        <input type="number" class="form-control" [(ngModel)]="newQuantity" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Reason for Adjustment</label>
+        <textarea
+          class="form-control"
+          rows="2"
+          [(ngModel)]="adjustNote"
+          placeholder="e.g. Spillage or Mismatch"
+        ></textarea>
+      </div>
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-light" (click)="closeAdjustStockModal()">
+          Cancel
+        </button>
+        <button class="btn btn-warning px-4" (click)="submitAdjustStock()">
+          Update Balance
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-container>

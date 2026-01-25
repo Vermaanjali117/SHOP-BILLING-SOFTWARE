@@ -1,20 +1,30 @@
-  /* hide scrollbars but keep scroll behavior */
-  .scrollbar-hide {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-  }
+/* Force images to a consistent box shape */
+.aspect-\[4\/3\] {
+  aspect-ratio: 4 / 3;
+}
 
-  /* ensure long category names don't break layout (tailwind utilities used too) */
-  .text-ellipsis {
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
+/* Limit description to exactly two lines to keep cards uniform */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
 
-  /* optional: subtle card focus outline for keyboard users */
-  .bg-white:focus-within {
-    outline: 2px solid rgba(163, 126, 92, 0.12);
-    outline-offset: 2px;
-  }
+/* Standardized transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Prevent layout shift when items are added to cart */
+.shrink-0 {
+  flex-shrink: 0;
+}
+
+/* Background refinement */
+:host {
+  display: block;
+  background-color: #faf9f6;
+}

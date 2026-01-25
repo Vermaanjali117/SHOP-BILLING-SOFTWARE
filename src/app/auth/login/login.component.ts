@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
     };
     this.service.loginpost(obj).subscribe((res:any)=>{
       console.log(res);
-      if (res.message == 'loggedIn successfully') {
+      if (res.message == 'Logged in successfully') {
         this.router.navigateByUrl('/dashboard/home');
    this.toastr.success("LoggedIn Successfully")
       }

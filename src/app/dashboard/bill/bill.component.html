@@ -1,12 +1,14 @@
+
 <!-- Customer Invoice -->
 <div id="customer-copy" class="w-[300px] mx-auto text-black">
+ 
   <!-- Company Header -->
   <div class="text-center mb-2">
     <h4 class="text-[18px] font-extrabold uppercase tracking-wide">
       THE BELGIQUE BITES CO
     </h4>
     <p class="text-[13px] font-semibold">Annpurna Enterprise</p>
-    <p class="text-[11px] leading-tight max-w-[250px] mx-auto">
+    <p class="text-[10px] leading-tight max-w-[250px] mx-auto">
       51-A Chandranagar Charari Lal<br />
       Banglow, Kanpur - 208007
     </p>
@@ -14,16 +16,15 @@
   </div>
 
   <!-- Invoice Info -->
-<div class="mb-2 text-[12px] invoice-info">
-  <p><b>Order No:</b> {{ order_detail.orderNumber }}</p>
-  <p><b>Token:</b> {{ order_detail.tokenNumber }}</p>
-  <p><b>Date:</b> {{ order_detail.date | date : "dd/MM/yyyy" }}</p>
-  <p><b>Customer:</b> {{ order_detail.customerName }}</p>
-  <p><b>Phone:</b> {{ order_detail.phone }}</p>
-  <p><b>Payment:</b> {{ order_detail.paymentMode }}</p>
-  <p><b>Order Type:</b> {{ order_detail.ordertype }}</p>
-</div>
-
+  <div class="mb-2 text-[10px] invoice-info">
+    <p><b>Order No:</b> {{ order_detail.orderNumber }}</p>
+    <p><b>Token:</b> {{ order_detail.tokenNumber }}</p>
+    <p><b>Date:</b> {{ order_detail.date | date : "dd/MM/yyyy" }}</p>
+    <p><b>Customer:</b> {{ order_detail.customerName }}</p>
+    <p><b>Phone:</b> {{ order_detail.phone }}</p>
+    <p><b>Payment:</b> {{ order_detail.paymentMode }}</p>
+    <p><b>Order Type:</b> {{ order_detail.ordertype }}</p>
+  </div>
 
   <p class="text-[11px]">--------------------------------------------------</p>
 
@@ -40,7 +41,7 @@
       <tr *ngFor="let data of order_items">
         <td>{{ data.name }}</td>
         <td class="text-center">{{ data.qty }}</td>
-        <td class="text-right">₹{{ data.price.toFixed(2) }}</td>
+        <td class="text-right">₹{{ (data.price || 0) | number:'1.2-2' }}</td>
       </tr>
     </tbody>
   </table>
@@ -49,10 +50,23 @@
 
   <!-- Totals -->
   <div class="text-[12px]">
-   
+    <!-- Discount Row (only when discount present) -->
+    <div *ngIf="order_detail.discountAmount && order_detail.discountAmount > 0" class="flex justify-between mb-1">
+      <span>
+        Discount
+        <ng-container *ngIf="order_detail.discountType === 'percentage'">
+          ({{ order_detail.discountValue }}%)
+        </ng-container>
+        <ng-container *ngIf="order_detail.discountType === 'fixed'">
+          (₹{{ order_detail.discountValue | number:'1.2-2' }})
+        </ng-container>
+      </span>
+      <span>-₹{{ (order_detail.discountAmount || 0) | number:'1.2-2' }}</span>
+    </div>
+
     <p class="flex justify-between font-bold text-[13px] mt-1">
       <span>Grand Total:</span>
-      <span>₹{{ order_detail?.grandTotal?.toFixed(2) }}</span>
+      <span>₹{{ (order_detail?.grandTotal || 0) | number:'1.2-2' }}</span>
     </p>
   </div>
 
@@ -90,6 +104,9 @@
 
 <!-- Print Buttons -->
 <div id="print-button-container" class="text-center mt-4">
+    <button (click)="onEdit()" class="px-4 py-1 bg-black text-white rounded text-sm mr-2">
+     Edit Bill
+  </button>
   <button (click)="printCustomer()" class="px-4 py-1 bg-black text-white rounded text-sm mr-2">
     Print Customer Copy
   </button>

@@ -1,146 +1,212 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SharedService } from '../../../Shared/shared.service';
-import { CommonModule, DatePipe } from '@angular/common';
+import { Location, CommonModule } from '@angular/common';
 import { CartService } from '../../../Shared/cart.service';
-import { Router } from '@angular/router';
-
 @Component({
   selector: 'app-bill',
   templateUrl: './bill.component.html',
   styleUrls: ['./bill.component.css'],
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule],
 })
 export class BillComponent implements OnInit {
-  order: any;
-  orderId: any;
-  order_detail: any = [];
-  order_items: any = [];
+  orderId: string | null = null;
+  order_detail: any = {
+    orderNumber: '',
+    tokenNumber: '',
+    date: new Date(),
+    customerName: '',
+    phone: '',
+    paymentMode: '',
+    ordertype: '',
+    items: [],
+    subTotal: 0,
+    handling: 0,
+    grandTotal: 0,
+    discountAmount: 0,
+    discountType: null,
+    discountValue: 0,
+    discountReason: null,
+  };
+  order_items: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
-    private http: HttpClient,
-    public service: SharedService,
+    private sharedservice: SharedService,
+    private location: Location,
+    private router: Router,
     public cartservice: CartService,
-    public router: Router
   ) {}
 
   ngOnInit(): void {
-    this.orderId = this.route.snapshot.paramMap.get('id');
-    this.getorderdetail();
+    // get order id from route (adjust param name if different)
+    this.orderId =
+      this.route.snapshot.paramMap.get('id') ||
+      this.route.snapshot.paramMap.get('orderId');
+
+    if (this.orderId) {
+      this.loadOrder(this.orderId);
+    } else {
+      // if order is passed some other way, handle it here
+      console.warn('No order id in route');
+    }
   }
 
-  getorderdetail() {
-    this.service.getOrderById(this.orderId).subscribe((res: any) => {
-      if (res.status == 'successful') {
-        this.order_detail = res.data;
-        this.order_items = res.data.items;
-        console.log('this.order_detail ====', this.order_detail);
-      }
+  loadOrder(id: string) {
+    // adapt to your sharedservice method name
+    this.sharedservice.getOrderById(id).subscribe({
+      next: (res: any) => {
+        // adapt to your response shape (res.order or res.data)
+        const order = res?.order || res?.data || res;
+        if (!order) {
+          console.error('Order response missing', res);
+          return;
+        }
+        this.order_detail = order;
+        console.log('this.order_detail ===============', this.order_detail);
+        this.order_items = Array.isArray(order.items) ? order.items : [];
+        // ensure numeric values
+        this.order_detail.discountAmount = Number(order.discountAmount || 0);
+        this.order_detail.discountValue = Number(order.discountValue || 0);
+        this.order_detail.grandTotal = Number(order.grandTotal || 0);
+        console.log('order_detail =======', this.order_detail);
+      },
+      error: (err) => {
+        console.error('Failed to load order', err);
+      },
     });
   }
 
-  // Print helpers
-  private printHtml(htmlContent: string, paperWidth: '58mm' | '80mm' = '80mm'): void {
-    const printWindow = window.open('', '_blank', 'toolbar=0,location=0,menubar=0');
-    if (!printWindow) {
-      console.warn('Popup blocked. Allow popups for this site to print.');
+  // helper that returns whether a discount exists
+  hasDiscount(): boolean {
+    return !!(
+      this.order_detail && Number(this.order_detail.discountAmount) > 0
+    );
+  }
+
+  // formatting helpers (optional)
+  formatAmount(n: any): string {
+    const v = Number(n || 0);
+    return v.toFixed(2);
+  }
+
+  // print functions: open a small print window and print the element's innerHTML
+  printCustomer() {
+    const el = document.getElementById('customer-copy');
+    if (!el) {
+      alert('Customer copy element not found');
       return;
     }
+    const content = el.innerHTML;
+    const win = window.open('', '_blank', 'width=400,height=700');
+    if (!win) return;
 
-    const style = `
-      <style>
-        @page { margin: 4mm; }
-        html, body { margin:0; padding:0; background:#fff; }
-        body { display:flex; justify-content:center; }
-        .print-container {
-          width: ${paperWidth};
-          box-sizing: border-box;
-          padding: 3px 8px;
-          font-family: Arial, Helvetica, sans-serif;
-          font-size: 12px;
-          line-height: 1.15;
-          color: #000;
-        }
-        table { width:100%; border-collapse:collapse; }
-        th, td { padding: 2px 0; text-align:left; vertical-align: top; }
-        .text-center { text-align:center; }
-        .text-right { text-align:right; }
-        .text-left { text-align:left; }
-        @media print {
-          body { width: ${paperWidth}; }
-          .no-print { display:none !important; }
-        }
-      </style>
-    `;
+    win.document.write(`
+    <html>
+      <head>
+        <title>Invoice</title>
+        <style>
+          /* Reset margins for printing */
+          @page { margin: 0; }
+          body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            color: #000; 
+            margin: 10px;
+            padding: 0;
+          }
+          .w-[300px] { width: 280px; margin: 0 auto; }
+          
+          /* Heading Fix: Force single line and smaller font */
+          h4 { 
+            font-size: 16px; 
+            margin: 0 0 2px 0; 
+            white-space: nowrap; 
+            font-weight: 800;
+            text-transform: uppercase;
+          }
+          
+          /* Tighten spacing */
+          p { margin: 1px 0; line-height: 1.2; }
+          .text-center { text-align: center; }
+          .text-[10px] { font-size: 10px; }
+          .text-[11px] { font-size: 11px; }
+          .text-[12px] { font-size: 11px; } /* Slightly smaller for better fit */
+          
+          /* Table styling */
+          table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+          th { border-bottom: 1px dashed #000; text-align: left; font-size: 11px; }
+          td { padding: 3px 0; vertical-align: top; }
+          .text-right { text-align: right; }
+          .text-center { text-align: center; }
+          
+          /* Totals Section */
+          .font-bold { font-weight: bold; }
+          .flex { display: flex; justify-content: space-between; }
+        </style>
+      </head>
+      <body>
+        <div class="w-[300px]">
+          ${content}
+        </div>
+      </body>
+    </html>
+  `);
+    win.document.close();
 
-    printWindow.document.open();
-    printWindow.document.write(`
-      <!doctype html>
+    setTimeout(() => {
+      win.focus();
+      win.print();
+      win.close();
+    }, 300);
+
+    this.cartservice.clearCart();
+    localStorage.removeItem('editingOrder');
+  }
+
+  printKOT() {
+    const el = document.getElementById('kot');
+    if (!el) {
+      alert('KOT element not found');
+      return;
+    }
+    const content = el.innerHTML;
+    const win = window.open('', '_blank', 'width=400,height=500');
+    if (!win) return;
+    win.document.write(`
       <html>
         <head>
-          <meta charset="utf-8" />
-          <title>Print</title>
-          ${style}
+          <title>KOT</title>
+          <style>
+            body { font-family: Arial, sans-serif; color: #000; }
+            .w-[300px]{ width: 300px; margin: 0 auto; }
+            .text-center { text-align: center; }
+            .text-[12px] { font-size: 12px; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            td, th { padding: 4px 0; }
+          </style>
         </head>
         <body>
-          <div class="print-container">
-            ${htmlContent}
+          <div class="w-[300px]">
+            ${content}
           </div>
         </body>
       </html>
     `);
-    printWindow.document.close();
-
-    // Wait for render, then print and close window
-    printWindow.onload = () => {
-      setTimeout(() => {
-        printWindow.focus();
-        printWindow.print();
-        // Close after printing (some browsers block window.close if not opened by script print)
-        setTimeout(() => {
-          printWindow.close();
-        }, 500);
-      }, 200);
-    };
-  }
-
-  // Print only customer copy; after successful print we clear cart and navigate
-  printCustomer(): void {
-    const invoiceEl = document.getElementById('customer-copy');
-    if (!invoiceEl) {
-      console.error('Customer copy element not found');
-      return;
-    }
-    const invoiceHtml = invoiceEl.outerHTML;
-    this.printHtml(invoiceHtml, '80mm'); // change to '80mm' if using 80mm paper
-
-    // keep old behaviour: clear cart after some delay (only for customer copy)
+    win.document.close();
     setTimeout(() => {
-      this.clearCart();
-    }, 3000);
+      win.focus();
+      win.print();
+      win.close();
+    }, 300);
   }
 
-  // Print only KOT (no cart clear / no redirect)
-  printKOT(): void {
-    const kotEl = document.getElementById('kot');
-    if (!kotEl) {
-      console.error('KOT element not found');
-      return;
-    }
-    const kotHtml = kotEl.outerHTML;
-    this.printHtml(kotHtml, '80mm'); // change to '80mm' if using 80mm paper
+  // optional: go back
+  back() {
+    this.location.back();
   }
-
-  clearCart() {
-    // replace alert + keep previous behaviour
-    // remove temporary alert and update cart
-    // alert('df'); // removed
-    this.cartservice.updatecartvalue.next([]);
-
-    // ✅ Redirect to Home
-    // this.router.navigate(['/dashboard/home']);
+  onEdit() {
+    localStorage.setItem('editingOrder', JSON.stringify(this.order_detail));
+    this.router.navigate(['/dashboard/cart']);
   }
 }

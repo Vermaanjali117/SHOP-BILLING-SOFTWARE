@@ -1,127 +1,102 @@
-<div class="text-left font-bold text-xl pt-2 pb-2">Invoice List</div>
-
-<ag-grid-angular
-  class="ag-theme-alpine"
-  style="width: 100%; height: 400px"
-  [rowData]="rowData"
-  [columnDefs]="columnDefs"
-  [pagination]="true"
-  [paginationPageSize]="10"
-    class="ag-theme-alpine custom-grid"
->
-</ag-grid-angular>
-
+<div class="p-3 bg-gray-50 min-h-screen">
+  <div class="flex justify-between items-center mb-1">
+    <h2 class="text-2xl font-bold text-gray-800 tracking-tight">
+      Invoice Management
+    </h2>
+    <div class="flex gap-2"></div>
+  </div>
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+  >
+    <ag-grid-angular
+      style="width: 100%; height: 500px"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [pagination]="true"
+      [paginationPageSize]="10"
+      class="ag-theme-alpine custom-grid"
+    >
+    </ag-grid-angular>
+  </div>
+</div>
 <div
   *ngIf="showbillreciept"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
 >
+  <!-- RECEIPT CARD -->
   <div
-    class="bg-[#f9f6f1] rounded-2xl shadow-xl w-full max-w-2xl p-6 relative overflow-y-auto max-h-[90vh]"
+    class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden font-sans"
   >
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-bold text-[#4e362b]">Bill Receipt</h3>
+    <!-- HEADER -->
+    <div class="px-5 py-4 border-b text-center relative">
+      <h2 class="text-lg font-semibold tracking-wide">The Belgique Bites Co</h2>
+      <p class="text-xs text-gray-500">Cafe Receipt</p>
+
       <button
-        class="text-gray-500 hover:text-[#6b4e3d] transition"
         (click)="closeModal()"
+        class="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
       >
         ✕
       </button>
     </div>
 
-    <!-- Receipt Preview -->
-    <div id="print-area" class="bg-white rounded-xl shadow p-6">
-      <!-- Company Header -->
-      <div class="text-center mb-6">
-        <h6 class="text-2xl font-bold text-gray-800">
-          The Belgique Bites <span class="text-[#6b4e3d]">Co</span>
-        </h6>
-        <p class="text-sm text-gray-500">
-          51-A Chandranagar Charari Lal Banglow Kanpur, 208007
-        </p>
+    <!-- META -->
+    <div class="px-5 py-3 text-sm text-gray-700 space-y-1">
+      <div class="flex justify-between">
+        <span>Order No</span>
+        <span class="font-medium">{{ order_detail.orderNumber }}</span>
       </div>
-
-      <!-- Invoice Info -->
-      <div class="grid grid-cols-2 gap-y-2 text-sm mb-4">
-        <p><strong>Order No:</strong> {{ order_detail.orderNumber }}</p>
-        <p><strong>Token No:</strong> {{ order_detail.tokenNumber }}</p>
-        <p>
-          <strong>Date:</strong> {{ order_detail.date | date : "dd/MM/yyyy" }}
-        </p>
-        <p><strong>Customer:</strong> {{ order_detail.customerName }}</p>
-        <p><strong>Phone:</strong> {{ order_detail.phone }}</p>
-        <p><strong>Payment Mode:</strong> {{ order_detail.paymentMode }}</p>
+      <div class="flex justify-between">
+        <span>Token</span>
+        <span>{{ order_detail.tokenNumber }}</span>
       </div>
+      <div class="flex justify-between">
+        <span>Date</span>
+        <span>{{ order_detail.date | date: "dd MMM yyyy, hh:mm a" }}</span>
+      </div>
+    </div>
 
-      <!-- Items Table -->
-      <table class="w-full text-sm mb-4">
-        <thead>
-          <tr class="border-b bg-[#f9f6f1]">
-            <th class="p-2 text-left">Item</th>
-            <th class="p-2 text-center">Qty</th>
-            <th class="p-2 text-right">Price</th>
-            <th class="p-2 text-right">Total</th>
+    <!-- CUSTOMER -->
+    <div class="px-5 py-3 border-t text-sm">
+      <div><strong>Customer:</strong> {{ order_detail.customerName }}</div>
+      <div><strong>Phone:</strong> {{ order_detail.phone }}</div>
+      <div><strong>Payment:</strong> {{ order_detail.paymentMode }}</div>
+    </div>
+
+    <!-- ITEMS -->
+    <div class="px-5 py-3 border-t text-sm">
+      <table class="w-full text-sm">
+        <thead class="text-gray-500 border-b">
+          <tr>
+            <th class="text-left py-1">Item</th>
+            <th class="text-center">Qty</th>
+            <th class="text-right">Price</th>
+            <th class="text-right">Total</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let data of order_items" class="border-b">
-            <td class="p-2">{{ data.name }}</td>
-            <td class="p-2 text-center">{{ data.qty }}</td>
-            <td class="p-2 text-right">₹{{ data.price.toFixed(2) }}</td>
-            <td class="p-2 text-right">₹{{ data.total.toFixed(2) }}</td>
+          <tr *ngFor="let i of order_items" class="border-b last:border-none">
+            <td class="py-2">{{ i.name }}</td>
+            <td class="text-center">{{ i.qty }}</td>
+            <td class="text-right">₹ {{ i.price }}</td>
+            <td class="text-right font-medium">₹ {{ i.total }}</td>
           </tr>
         </tbody>
       </table>
+    </div>
 
-      <!-- Totals -->
-      <div class="text-right text-sm space-y-2">
-        <p class="flex justify-between">
-          <span class="font-medium">Subtotal:</span>
-          <span>₹{{ order_detail?.subTotal?.toFixed(2) }}</span>
-        </p>
-        <p class="flex justify-between font-bold text-lg border-t pt-2">
-          <span>Grand Total:</span>
-          <span class="text-[#6b4e3d]"
-            >₹{{ order_detail.grandTotal.toFixed(2) }}</span
-          >
-        </p>
-      </div>
+    <!-- TOTAL -->
+    <div
+      class="px-5 py-4 border-t flex justify-between text-base font-semibold"
+    >
+      <span>Grand Total</span>
+      <span>₹ {{ order_detail.grandTotal }}</span>
+    </div>
 
-      <!-- Divider -->
-      <div class="border-t-2 border-dashed my-6"></div>
-
-      <!-- KOT -->
-      <div>
-        <h2 class="text-lg font-bold border-b pb-2 mb-4">
-          KOT (Kitchen Order Ticket)
-        </h2>
-        <div class="grid grid-cols-2 gap-y-2 text-sm mb-4">
-          <p><strong>Token No:</strong> {{ order_detail.tokenNumber }}</p>
-          <p>
-            <strong>Date:</strong> {{ order_detail.date | date : "dd/MM/yyyy" }}
-          </p>
-        </div>
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b bg-[#f9f6f1]">
-              <th class="p-2 text-left">Item</th>
-              <th class="p-2 text-center">Qty</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let data of order_items" class="border-b">
-              <td class="p-2">{{ data.name }}</td>
-              <td class="p-2 text-center">{{ data.qty }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Footer -->
-      <div class="text-center mt-6 text-sm text-gray-500">
-        <p>Thank you for your business!</p>
-        <p>Please come again!</p>
-      </div>
+    <!-- FOOTER -->
+    <div class="px-5 py-3 bg-gray-50 text-center text-xs text-gray-500">
+      Thank you for visiting ❤️<br />
+      Visit again!
     </div>
   </div>
 </div>

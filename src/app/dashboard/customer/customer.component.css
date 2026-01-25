@@ -1,0 +1,28 @@
+.custom-grid {
+  --ag-header-background-color: #f9f6f1;
+  --ag-header-foreground-color: #4e362b;
+  --ag-border-color: #e5e7eb;
+  --ag-border-radius: 12px;
+  --ag-font-size: 14px;
+}
+
+/* Make headers bold */
+.custom-grid .ag-header-cell-label {
+  font-weight: 700;
+}
+
+/* Row Hover Effect */
+.custom-grid .ag-row-hover {
+  background-color: #fdfbf7 !important;
+}
+
+/* Custom Scrollbar for the Grid */
+.custom-grid ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-grid ::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}

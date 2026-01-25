@@ -1,0 +1,34 @@
+<main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-3">
+  <div class="flex gap-3 mb-3 items-center">
+    <input type="date" class="form-control w-auto" [(ngModel)]="fromDate" />
+
+    <input type="date" class="form-control w-auto" [(ngModel)]="toDate" />
+    <button
+      class="btn btn-danger"
+      (click)="deleteByDateRange()"
+      [disabled]="!fromDate || !toDate"
+    >
+      Delete Range
+    </button>
+
+    <button
+      class="btn btn-outline-danger ms-auto"
+      (click)="deleteInventoryBulk()"
+    >
+      Delete Selected
+    </button>
+  </div>
+  <ag-grid-angular
+    class="ag-theme-alpine custom-grid"
+    style="width: 100%; height: 420px"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [rowClassRules]="rowClassRules"
+    rowSelection="multiple"
+    [pagination]="true"
+    [paginationPageSize]="10"
+    (gridReady)="onGridReady($event)"
+    (selectionChanged)="onSelectionChanged()"
+  >
+  </ag-grid-angular>
+</main>

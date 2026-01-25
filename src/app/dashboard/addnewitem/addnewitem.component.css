@@ -1,8 +1,98 @@
-.text-danger {
-  color: #dc3545; /* Bootstrap red */
-  font-weight: bold;
+/* Custom AG Grid Styling */
+.custom-grid {
+  border: none !important;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
+
+.ag-theme-alpine {
+  --ag-header-background-color: #f8fafc;
+  --ag-header-foreground-color: #64748b;
+  --ag-header-cell-font-weight: 600;
+  --ag-font-size: 14px;
+  --ag-row-hover-color: #f1f5f9;
+  --ag-selected-row-parent-background-color: #f1f5f9;
+}
+
+/* Modal and Form Refinements */
+.form-input {
+  @apply mt-1 block w-full rounded-lg border-gray-200 bg-gray-50/50 p-2.5 transition-all duration-200;
+  border: 1px solid #e2e8f0;
+}
+
+.form-input:focus {
+  @apply bg-white ring-4 ring-[#6b4e3d]/10 border-[#6b4e3d] outline-none;
+}
+
 .text-danger1 {
-  color: #dc3545; /* Bootstrap red */
-  font-weight: normal;
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 4px;
+}
+.form-input {
+  width: 100%;
+  display: block;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.form-input:focus {
+  background-color: #ffffff;
+  border-color: #6b4e3d;
+  box-shadow: 0 0 0 3px rgba(107, 78, 61, 0.1);
+}
+
+.text-danger1 {
+  font-size: 10px;
+  color: #ef4444;
+  margin-top: 2px;
+  font-weight: 500;
+}
+/* Darker, more readable labels */
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800; /* Extra bold for clarity */
+  color: #1a1a1a;   /* Darker slate/black */
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-bottom: 2px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 6px 10px; /* Reduced vertical padding */
+  font-size: 13px;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: #6b4e3d;
+  box-shadow: 0 0 0 2px rgba(107, 78, 61, 0.1);
+}
+/* Darker, High-Contrast Labels */
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #111827; /* Near black for maximum readability */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+/* Tighten the Modal Header */
+.modal-header-compact {
+  padding: 10px 16px !important; /* Forces a very thin header */
 }

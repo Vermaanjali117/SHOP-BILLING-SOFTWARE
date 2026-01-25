@@ -1,0 +1,86 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-text">
+      <h5 class="paddingcustom">Overall business insights (Last 7 Days)</h5>
+    </div>
+
+    <div class="filter-controls">
+      <div class="date-group">
+        <div class="input-wrapper">
+          <label>From</label>
+          <input type="date" [(ngModel)]="fromDate" />
+        </div>
+        <div class="input-wrapper">
+          <label>To</label>
+          <input type="date" [(ngModel)]="toDate" />
+        </div>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-apply" (click)="applyDateFilter()">Apply</button>
+        <button class="btn btn-secondary" (click)="resetToLast7Days()">
+          Last 7 Days
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="kpi-grid">
+    <div class="kpi-card revenue-card">
+      <div class="kpi-icon">₹</div>
+      <div class="kpi-content">
+        <span class="kpi-label">Revenue</span>
+        <h2 class="kpi-value">₹ {{ totalRevenue | number }}</h2>
+        <span class="kpi-sub">Overall Earnings</span>
+      </div>
+    </div>
+
+    <div class="kpi-card transactions-card">
+      <div class="kpi-icon">📦</div>
+      <div class="kpi-content">
+        <span class="kpi-label">Transactions</span>
+        <h2 class="kpi-value">{{ totalOrders }}</h2>
+        <span class="kpi-sub"
+          >AOV: ₹ {{ totalRevenue / totalOrders || 0 | number: "1.0-0" }}</span
+        >
+      </div>
+    </div>
+
+    <div class="kpi-card consumption-card">
+      <div class="kpi-icon">⚖️</div>
+      <div class="kpi-content">
+        <span class="kpi-label">Total Consumption</span>
+        <h2 class="kpi-value">{{ totalConsumption | number }}</h2>
+        <span class="kpi-sub">Raw material (gm)</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="chart-section">
+    <div class="section-header">
+      <h3>Revenue Timeline</h3>
+      <span class="trend-tag">Daily revenue trend</span>
+    </div>
+    <div class="chart-container">
+      <app-linechart [data]="revenueSeries"></app-linechart>
+    </div>
+  </section>
+
+  <section class="table-section">
+    <div class="section-header">
+      <h3>Raw Material Consumption</h3>
+      <span>Usage breakdown by item</span>
+    </div>
+    <div class="grid-wrapper">
+      <ag-grid-angular
+        (gridReady)="onGridReady($event)"
+        style="width: 100%; height: 350px"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [pagination]="true"
+        [paginationPageSize]="10"
+        class="ag-theme-alpine custom-grid"
+      >
+      </ag-grid-angular>
+    </div>
+  </section>
+</div>

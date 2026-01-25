@@ -24,4 +24,9 @@ export type Order = {
   handling: number;
   grandTotal: number;
     ordertype:string;
+      discountAmount?: number;   
+  discountType?: 'percentage' | 'fixed' | null;
+  discountValue?: number;      
+  discountReason?: string | null;
+
 };
