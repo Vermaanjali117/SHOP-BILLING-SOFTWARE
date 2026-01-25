@@ -25,7 +25,6 @@
     "datatables.net-dt": "^2.3.2",
     "echarts": "^6.0.0",
     "jquery": "^3.7.1",
-    "ngx-print-element": "^2.1.8",
     "ngx-toastr": "^17.0.2",
     "qz-tray": "^2.2.5",
     "rxjs": "~7.8.0",
