@@ -5,7 +5,9 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class SharedService {
+  // private apiUrl: any = 'http://localhost:3000/api';
   private apiUrl: any = 'https://api.thebelgiquebites.co.in/api';
+
   constructor(private http: HttpClient) {}
   loginpost(sync: any) {
     return this.http.post(`${this.apiUrl}/auth/login`, sync, {
@@ -157,26 +159,34 @@ export class SharedService {
       withCredentials: true,
     });
   }
+  Addpremix(sync: any) {
+    return this.http.post(
+      `${this.apiUrl}/raw-materials/produce-composite`,
+      sync,
+      {
+        withCredentials: true,
+      },
+    );
+  }
   DeleteRecipe(id: any) {
     return this.http.delete(`${this.apiUrl}/recipe/delete/${id}`, {
       withCredentials: true,
     });
   }
-getConsumptionSummary(fromDate?: string, toDate?: string) {
-  let params: any = {};
+  getConsumptionSummary(fromDate?: string, toDate?: string) {
+    let params: any = {};
 
-  if (fromDate && toDate) {
-    params.from = fromDate;
-    params.to = toDate;
-  }
-
-  return this.http.get(
-    `${this.apiUrl}/raw-materials/inventory/consumption-summary`,
-    {
-      params,               // ✅ THIS WAS MISSING
-      withCredentials: true,
+    if (fromDate && toDate) {
+      params.from = fromDate;
+      params.to = toDate;
     }
-  );
-}
 
+    return this.http.get(
+      `${this.apiUrl}/raw-materials/inventory/consumption-summary`,
+      {
+        params, // ✅ THIS WAS MISSING
+        withCredentials: true,
+      },
+    );
+  }
 }

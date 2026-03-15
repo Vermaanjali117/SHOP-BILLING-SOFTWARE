@@ -24,7 +24,7 @@ export class AddRecipeComponent implements OnInit {
   columnDefs: any = [];
   selectedItemId: any;
   delete_id: any;
-
+  gridApi: any;
   itemsList: any = [];
   get_item_list: any = [];
   rawMaterialsList: any = [];
@@ -53,34 +53,73 @@ export class AddRecipeComponent implements OnInit {
     this.materials.push({
       rawMaterialId: null,
       quantityRequired: 0,
+      unit: 'gm', // 🔥 Always default to a unit to prevent nulls in backend
     });
   }
-
   removeMaterial(index: number) {
     this.materials.splice(index, 1);
   }
-
+  // New logic for the '-' button
+  removeLastMaterial() {
+    if (this.materials.length > 0) {
+      this.materials.pop();
+    }
+  }
   saveRecipe() {
+    // 1. Basic Validation to prevent empty saves
+    if (!this.selectedItemId || this.materials.length === 0) {
+      this.toast.warning(
+        'Please select an item and add at least one material.',
+      );
+      return;
+    }
+
     this.loader.show();
-    // Addsaverecipe
-    var obj = {
+
+    const obj = {
       itemId: this.selectedItemId,
-      materials: this.materials,
+      materials: this.materials, // Materials now contain {rawMaterialId, quantityRequired, unit}
     };
-    this.service.Addsaverecipe(obj).subscribe((res: any) => {
-      if (res.status == 'success') {
-        this.toast.success(res.message);
-        this.closeRecipeModal();
-        this.materials = [];
-        this.selectedItemId = '';
-        this.service.getRawMaterial().subscribe((res: any) => {
-          this.get_row_material = res.materials;
-        });
+
+    this.service.Addsaverecipe(obj).subscribe({
+      next: (res: any) => {
+        if (res.status === 'success') {
+          this.toast.success(res.message);
+
+          // 2. Clear data and close UI
+          this.resetRecipeForm(); // Using a helper to keep it clean
+          this.closeRecipeModal();
+
+          // 3. Refresh the Recipe list instead of just raw materials
+          // This ensures the main Ag-Grid updates with the new recipe
+          this.GetSavedRecipelist_detail();
+        } else {
+          this.toast.warning(res.message);
+        }
         this.loader.hide();
-      } else {
-        this.toast.warning(res.message);
-      }
+      },
+      error: (err) => {
+        console.error('Recipe Save Error:', err);
+        this.toast.error('Something went wrong while saving the recipe.');
+        this.loader.hide();
+      },
     });
+  }
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+    params.api.sizeColumnsToFit();
+
+    // Responsive fix: resize table when window changes
+    window.addEventListener('resize', () => {
+      setTimeout(() => {
+        params.api.sizeColumnsToFit();
+      });
+    });
+  }
+  // Helper to reset form state
+  resetRecipeForm() {
+    this.materials = [];
+    this.selectedItemId = '';
   }
   getRawMateriallist() {
     this.loader.show();
@@ -110,22 +149,30 @@ export class AddRecipeComponent implements OnInit {
   }
   openEditRecipe(recipe: any) {
     this.getedit_id = recipe._id;
-    this.isEdit = true; // 🔥 edit mode ON
+    this.isEdit = true;
     this.selectedRecipe = recipe;
 
-    // ✅ set selected items
-    this.selectedItemId = recipe.itemId?._id;
+    // ✅ Set selected item (Final Product)
+    // Accessing ._id safely in case the population depth varies
+    this.selectedItemId = recipe.itemId?._id || recipe.itemId;
 
-    // ✅ prefill materials
+    // ✅ Prefill materials with Unit stability
     this.materials = recipe.materials.map((mat: any) => ({
-      rawMaterialId: mat.rawMaterialId?._id,
+      rawMaterialId: mat.rawMaterialId?._id || mat.rawMaterialId,
       quantityRequired: mat.quantityRequired,
+      // 🔥 CRITICAL: Map the unit from the database so the dropdown shows the correct value
+      unit: mat.unit || 'gm',
     }));
 
-    // ✅ open same modal
+    // ✅ Open the modal
     this.showAdjustModal = true;
   }
-
+  onQuickFilterChanged(event: any) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    if (this.gridApi) {
+      this.gridApi.setQuickFilter(filterValue);
+    }
+  }
   openAdjustStockModal() {
     this.showAdjustModal = true;
   }
@@ -133,6 +180,7 @@ export class AddRecipeComponent implements OnInit {
     this.loader.show();
     this.service.getSavedRecipe().subscribe((res: any) => {
       this.get_saved_recipe = res.recipes;
+      console.log('this.get_saved_recipe ====', this.get_saved_recipe);
       this.GetSavedRecipelist_detail();
       this.loader.hide();
     });
@@ -146,21 +194,22 @@ export class AddRecipeComponent implements OnInit {
       },
 
       {
-        headerName: 'Item Name',
-        valueGetter: (params: any) => params.data.itemId?.name,
+        headerName: 'Material/Item Name',
+        // Use dot notation to reach the nested name
+        field: 'productId.name',
         sortable: true,
         filter: true,
-        flex: 1.5,
+        flex: 2,
+        minWidth: 150,
       },
-
       {
         headerName: 'Price',
-        valueGetter: (params: any) =>
-          params.data.itemId?.price ? `₹${params.data.itemId.price}` : '-',
-        sortable: true,
+        // Access the price inside the productId object
+        valueGetter: (p: any) =>
+          p.data.productId?.price ? `₹${p.data.productId.price}` : '-',
         flex: 1,
+        minWidth: 100,
       },
-
       {
         headerName: 'Materials',
         cellRenderer: (params: any) => {

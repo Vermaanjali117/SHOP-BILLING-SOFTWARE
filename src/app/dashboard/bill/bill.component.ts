@@ -11,7 +11,23 @@ import { CartService } from '../../../Shared/cart.service';
   imports: [CommonModule],
 })
 export class BillComponent implements OnInit {
+  currentBranch: any = {};
+  branchId: any;
+  // Define your branch details here
+  branches: any = {
+    '695755832c76b65a570b1abb': {
+      name: 'THE BELGIQUE BITES CO',
+      subtitle: 'Annpurna Enterprise',
+      address: '51-A Chandranagar Charari Lal Banglow, Kanpur - 208007',
+    },
+    '695755902c76b65a570b1abd': {
+      name: 'THE BELGIQUE BITES CO',
+      subtitle: 'Riddhi Enterprises',
+      address: 'Gooba Garden Crossing, Metro pillor no -16 IIT kanpur',
+    },
+  };
   orderId: string | null = null;
+  adminid: any;
   order_detail: any = {
     orderNumber: '',
     tokenNumber: '',
@@ -40,6 +56,10 @@ export class BillComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.branchId = localStorage.getItem('admin');
+    this.currentBranch =
+      this.branches[this.branchId] || this.branches['BRANCH_ID_1'];
+    console.log('this.adminid ', this.branchId);
     // get order id from route (adjust param name if different)
     this.orderId =
       this.route.snapshot.paramMap.get('id') ||
@@ -54,26 +74,40 @@ export class BillComponent implements OnInit {
   }
 
   loadOrder(id: string) {
-    // adapt to your sharedservice method name
     this.sharedservice.getOrderById(id).subscribe({
       next: (res: any) => {
-        // adapt to your response shape (res.order or res.data)
         const order = res?.order || res?.data || res;
-        if (!order) {
-          console.error('Order response missing', res);
-          return;
-        }
+        if (!order) return;
+
         this.order_detail = order;
-        console.log('this.order_detail ===============', this.order_detail);
         this.order_items = Array.isArray(order.items) ? order.items : [];
-        // ensure numeric values
-        this.order_detail.discountAmount = Number(order.discountAmount || 0);
-        this.order_detail.discountValue = Number(order.discountValue || 0);
-        this.order_detail.grandTotal = Number(order.grandTotal || 0);
-        console.log('order_detail =======', this.order_detail);
-      },
-      error: (err) => {
-        console.error('Failed to load order', err);
+
+        // 1️⃣ Convert all fields to numbers to avoid string concatenation
+        const discountAmount = Number(order.discountAmount || 0);
+        const discountValue = Number(order.discountValue || 0);
+
+        // 2️⃣ Calculate Gross Total (the 150)
+        const calculatedSubTotal = this.order_items.reduce(
+          (acc, item) => acc + Number(item.price || 0) * Number(item.qty || 0),
+          0,
+        );
+
+        // 3️⃣ FORCE THE MATH: Grand Total = Subtotal - Discount
+        // We don't trust order.grandTotal here because it might be old data
+        const calculatedGrandTotal = calculatedSubTotal - discountAmount;
+
+        // 4️⃣ Assign back to the object for the HTML to see
+        this.order_detail.grossTotal = calculatedSubTotal; // For the "Gross Total" row
+        this.order_detail.subTotal = calculatedSubTotal;
+        this.order_detail.discountAmount = discountAmount;
+        this.order_detail.discountValue = discountValue;
+        this.order_detail.grandTotal = calculatedGrandTotal;
+
+        console.log('Math Check:', {
+          gross: this.order_detail.grossTotal,
+          discount: this.order_detail.discountAmount,
+          net: this.order_detail.grandTotal,
+        });
       },
     });
   }

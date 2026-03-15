@@ -9,6 +9,12 @@
 
   <!-- MAIN GRID -->
   <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+    <input
+      type="text"
+      placeholder="Search menu..."
+      (input)="onQuickFilterChanged($event)"
+      class="h-9 w-64 px-3 text-sm border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#6b4e3d]/20 focus:border-[#6b4e3d] bg-white outline-none transition-all placeholder:text-gray-400"
+    />
     <ag-grid-angular
       style="width: 100%; height: 500px"
       [rowData]="rowData"
@@ -43,7 +49,9 @@
 
       <div class="modal-body">
         <div class="mb-4">
-          <label class="form-label">Final Product (Item)</label>
+          <label class="form-label text-uppercase small fw-bold text-muted"
+            >Final Product (Item)</label
+          >
           <ng-select
             [items]="get_item_list"
             appendTo="body"
@@ -53,20 +61,20 @@
             [(ngModel)]="selectedItemId"
             [disabled]="isEdit"
             class="custom-ng-select"
-          >
-          </ng-select>
+          ></ng-select>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="form-label m-0">Required Raw Materials</label>
-        </div>
+        <label class="form-label text-uppercase small fw-bold text-muted mb-2"
+          >Required Raw Materials</label
+        >
 
-        <div class="table-responsive rounded-3 border">
+        <div class="table-responsive rounded-3 border mb-3">
           <table class="table table-custom m-0">
             <thead>
-              <tr>
+              <tr class="bg-light">
                 <th>Material</th>
-                <th width="120">Qty</th>
+                <th width="100">Qty</th>
+                <th width="100">Unit</th>
                 <th width="50"></th>
               </tr>
             </thead>
@@ -78,11 +86,10 @@
                     bindLabel="name"
                     bindValue="_id"
                     appendTo="body"
-                    placeholder="Search material..."
+                    placeholder="Select material..."
                     [(ngModel)]="mat.rawMaterialId"
                     class="custom-ng-select-sm"
-                  >
-                  </ng-select>
+                  ></ng-select>
                 </td>
                 <td>
                   <input
@@ -92,17 +99,44 @@
                     placeholder="0.00"
                   />
                 </td>
-                <td class="text-center">
+                <td>
+                  <select
+                    class="form-select form-select-sm"
+                    [(ngModel)]="mat.unit"
+                  >
+                    <option value="gm">gm</option>
+                    <option value="kg">kg</option>
+                    <option value="ml">ml</option>
+                    <option value="ltr">ltr</option>
+                    <option value="pcs">pcs</option>
+                  </select>
+                </td>
+                <td class="text-center align-middle">
                   <button
-                    class="btn btn-link text-danger p-0"
+                    type="button"
+                    class="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center"
+                    style="
+                      width: 28px;
+                      height: 28px;
+                      border-radius: 6px;
+                      line-height: 1;
+                      padding: 0;
+                    "
                     (click)="removeMaterial(i)"
                   >
-                    <i class="bi bi-trash"></i> 🗑️
+                    <span
+                      style="
+                        font-size: 1.25rem;
+                        font-weight: bold;
+                        margin-top: -2px;
+                      "
+                      >&times;</span
+                    >
                   </button>
                 </td>
               </tr>
               <tr *ngIf="materials.length === 0">
-                <td colspan="3" class="text-center py-4 text-muted small">
+                <td colspan="4" class="text-center py-4 text-muted small">
                   No materials added yet.
                 </td>
               </tr>
@@ -110,15 +144,20 @@
           </table>
         </div>
 
-        <button class="btn btn-add-material" (click)="addMaterial()">
-          + Add Material Line
-        </button>
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-outline-primary btn-sm flex-grow-1 border-dashed py-2"
+            (click)="addMaterial()"
+          >
+            + Add Material Line
+          </button>
+        </div>
       </div>
 
-      <div class="modal-footer">
+      <div class="modal-footer bg-light">
         <button
           type="button"
-          class="btn btn-light"
+          class="btn btn-light border"
           (click)="closeRecipeModal()"
         >
           Cancel
@@ -126,7 +165,9 @@
         <button
           type="button"
           class="btn btn-primary px-4"
+          [disabled]="!selectedItemId || materials.length === 0"
           (click)="isEdit ? editRecipe() : saveRecipe()"
+          style="background-color: #67b18b; border: none"
         >
           {{ isEdit ? "Update Changes" : "Save Recipe" }}
         </button>

@@ -244,7 +244,7 @@ export class CartComponent implements OnInit {
           this.toggleCart();
           const order_id = res.order?._id;
           // from anywhere -> /dashboard/bill/:id
-          this.router.navigate(['/dashboard', 'bill', order_id]);
+           this.router.navigate(['/dashboard', 'bill', order_id]);
         } else {
           this.toast.error(res?.message || 'Failed to create invoice');
         }

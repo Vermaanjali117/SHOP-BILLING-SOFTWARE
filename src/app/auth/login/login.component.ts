@@ -16,21 +16,31 @@ import { ToastrService } from 'ngx-toastr';
 export class LoginComponent implements OnInit {
   password: any;
   email: any;
-  constructor(public service: SharedService, private router: Router,private toastr: ToastrService,public loader:LoaderService) {}
+  adminid: any;
+  constructor(
+    public service: SharedService,
+    private router: Router,
+    private toastr: ToastrService,
+    public loader: LoaderService,
+  ) {}
   ngOnInit(): void {}
   login() {
-    this.loader.show()
+    this.loader.show();
     var obj = {
       email: this.email,
       password: this.password,
     };
-    this.service.loginpost(obj).subscribe((res:any)=>{
+    this.service.loginpost(obj).subscribe((res: any) => {
       console.log(res);
       if (res.message == 'Logged in successfully') {
+    
+        this.adminid = res.admin.branchId;
+    
+        localStorage.setItem('admin',this.adminid)
         this.router.navigateByUrl('/dashboard/home');
-   this.toastr.success("LoggedIn Successfully")
+        this.toastr.success('LoggedIn Successfully');
       }
     });
-        this.loader.hide()
+    this.loader.hide();
   }
 }
