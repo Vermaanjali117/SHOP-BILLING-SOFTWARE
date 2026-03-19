@@ -1,20 +1,23 @@
 <div class="page-container">
-  <!-- HEADER -->
   <div class="header-section">
     <h2 class="title-main">Recipe Management</h2>
-    <button class="btn btn-primary shadow-sm" (click)="openAdjustStockModal()">
-      <span class="me-1">+</span> Add New Recipe
-    </button>
+    
+    <div class="header-actions">
+      <div class="search-container">
+        <input
+          type="text"
+          placeholder="Search menu..."
+          (input)="onQuickFilterChanged($event)"
+          class="search-input"
+        />
+      </div>
+      <button class="btn btn-add-recipe shadow-sm" (click)="openAdjustStockModal()">
+        <span class="me-1">+</span> Add New Recipe
+      </button>
+    </div>
   </div>
 
-  <!-- MAIN GRID -->
   <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-    <input
-      type="text"
-      placeholder="Search menu..."
-      (input)="onQuickFilterChanged($event)"
-      class="h-9 w-64 px-3 text-sm border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#6b4e3d]/20 focus:border-[#6b4e3d] bg-white outline-none transition-all placeholder:text-gray-400"
-    />
     <ag-grid-angular
       style="width: 100%; height: 500px"
       [rowData]="rowData"
@@ -26,35 +29,20 @@
     </ag-grid-angular>
   </div>
 
-  <!-- BACKDROP -->
-  <div
-    class="modal-backdrop"
-    *ngIf="showAdjustModal || showRecipeModal"
-    (click)="closeRecipeModal()"
-  ></div>
+  <div class="modal-backdrop" *ngIf="showAdjustModal || showRecipeModal" (click)="closeRecipeModal()"></div>
 
-  <!-- ADD/EDIT MODAL -->
   <div class="custom-modal" *ngIf="showAdjustModal">
     <div class="modal-box">
       <div class="modal-header">
-        <h5 class="modal-title">
-          {{ isEdit ? "Edit Recipe" : "Create New Recipe" }}
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          (click)="closeRecipeModal()"
-        ></button>
+        <h5 class="modal-title">{{ isEdit ? "Edit Recipe" : "Create New Recipe" }}</h5>
+        <button type="button" class="btn-close" (click)="closeRecipeModal()"></button>
       </div>
 
       <div class="modal-body">
         <div class="mb-4">
-          <label class="form-label text-uppercase small fw-bold text-muted"
-            >Final Product (Item)</label
-          >
+          <label class="form-label text-uppercase small fw-bold text-muted">Final Product (Item)</label>
           <ng-select
             [items]="get_item_list"
-            appendTo="body"
             appendTo="body"
             bindLabel="name"
             bindValue="_id"
@@ -65,9 +53,7 @@
           ></ng-select>
         </div>
 
-        <label class="form-label text-uppercase small fw-bold text-muted mb-2"
-          >Required Raw Materials</label
-        >
+        <label class="form-label text-uppercase small fw-bold text-muted mb-2">Required Raw Materials</label>
 
         <div class="table-responsive rounded-3 border mb-3">
           <table class="table table-custom m-0">
@@ -93,18 +79,10 @@
                   ></ng-select>
                 </td>
                 <td>
-                  <input
-                    type="number"
-                    class="form-control form-control-sm"
-                    [(ngModel)]="mat.quantityRequired"
-                    placeholder="0.00"
-                  />
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="mat.quantityRequired" placeholder="0.00" />
                 </td>
                 <td>
-                  <select
-                    class="form-select form-select-sm"
-                    [(ngModel)]="mat.unit"
-                  >
+                  <select class="form-select form-select-sm" [(ngModel)]="mat.unit">
                     <option value="gm">gm</option>
                     <option value="kg">kg</option>
                     <option value="ml">ml</option>
@@ -113,115 +91,32 @@
                   </select>
                 </td>
                 <td class="text-center align-middle">
-                  <button
-                    type="button"
-                    class="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center"
-                    style="
-                      width: 28px;
-                      height: 28px;
-                      border-radius: 6px;
-                      line-height: 1;
-                      padding: 0;
-                    "
-                    (click)="removeMaterial(i)"
-                  >
-                    <span
-                      style="
-                        font-size: 1.25rem;
-                        font-weight: bold;
-                        margin-top: -2px;
-                      "
-                      >&times;</span
-                    >
+                  <button type="button" class="btn btn-outline-danger btn-sm delete-row-btn" (click)="removeMaterial(i)">
+                    <span>&times;</span>
                   </button>
                 </td>
               </tr>
               <tr *ngIf="materials.length === 0">
-                <td colspan="4" class="text-center py-4 text-muted small">
-                  No materials added yet.
-                </td>
+                <td colspan="4" class="text-center py-4 text-muted small">No materials added yet.</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div class="d-flex gap-2">
-          <button
-            class="btn btn-outline-primary btn-sm flex-grow-1 border-dashed py-2"
-            (click)="addMaterial()"
-          >
-            + Add Material Line
-          </button>
-        </div>
+        <button class="btn btn-outline-primary btn-sm w-100 border-dashed py-2" (click)="addMaterial()">
+          + Add Material Line
+        </button>
       </div>
 
       <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-light border" (click)="closeRecipeModal()">Cancel</button>
         <button
           type="button"
-          class="btn btn-light border"
-          (click)="closeRecipeModal()"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary px-4"
+          class="btn btn-save px-4"
           [disabled]="!selectedItemId || materials.length === 0"
           (click)="isEdit ? editRecipe() : saveRecipe()"
-          style="background-color: #67b18b; border: none"
         >
           {{ isEdit ? "Update Changes" : "Save Recipe" }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- VIEW DETAILS MODAL -->
-  <div class="custom-modal" *ngIf="showRecipeModal">
-    <div class="modal-box">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title text-white">
-          {{ selectedRecipe?.itemId?.name }} Details
-        </h5>
-        <button
-          class="btn-close btn-close-white"
-          (click)="closeRecipeModalRowMaterial()"
-        ></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="alert alert-info border-0 py-2 mb-4">
-          <small>Recipe details for manufacturing one unit of this item.</small>
-        </div>
-
-        <table class="table table-hover border">
-          <thead class="table-light">
-            <tr>
-              <th>Raw Material</th>
-              <th class="text-end">Qty Used</th>
-              <th>Unit</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-          <tbody>
-            <tr *ngFor="let mat of selectedRecipe?.materials">
-              <td class="fw-medium">{{ mat.rawMaterialId?.name }}</td>
-              <td class="text-end fw-bold">{{ mat.quantityRequired }}</td>
-
-              <td class="text-muted">
-                {{ mat.unit || mat.rawMaterialId?.unit }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="modal-footer">
-        <button
-          class="btn btn-secondary"
-          (click)="closeRecipeModalRowMaterial()"
-        >
-          Close
         </button>
       </div>
     </div>

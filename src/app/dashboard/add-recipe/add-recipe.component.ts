@@ -292,7 +292,6 @@ export class AddRecipeComponent implements OnInit {
     this.rowData = this.get_saved_recipe;
   }
   deleteRecipe(data: any) {
-    console.log('data =======', data);
     alert('Are you sure you want to delete ' + data.productId?.name);
     this.delete_id = data._id;
     this.service.DeleteRecipe(this.delete_id).subscribe((res: any) => {

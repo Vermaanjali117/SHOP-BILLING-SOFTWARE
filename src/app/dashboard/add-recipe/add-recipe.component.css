@@ -276,3 +276,107 @@
   background-color: #e9ecef !important;
   color: #0d6efd;
 }
+.page-container {
+  padding: 20px;
+}
+
+/* Header Alignment */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title-main {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Space between search and button */
+}
+
+/* Search Input Styling */
+.search-input {
+  height: 40px;
+  width: 280px;
+  padding: 0 15px;
+  font-size: 0.9rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  outline: none;
+  background-color: #ffffff;
+  transition: all 0.2s ease-in-out;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Button Styling */
+.btn-add-recipe {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.btn-save {
+  background-color: #67b18b;
+  color: white;
+  border: none;
+}
+
+/* Modal and Table Fixes */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.custom-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1050;
+  width: 100%;
+  max-width: 600px;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.delete-row-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
