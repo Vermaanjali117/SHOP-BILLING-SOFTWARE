@@ -55,6 +55,7 @@
           <ng-select
             [items]="get_item_list"
             appendTo="body"
+            appendTo="body"
             bindLabel="name"
             bindValue="_id"
             placeholder="Search and select an item..."
@@ -201,11 +202,15 @@
               <th>Unit</th>
             </tr>
           </thead>
+          <tbody></tbody>
           <tbody>
             <tr *ngFor="let mat of selectedRecipe?.materials">
               <td class="fw-medium">{{ mat.rawMaterialId?.name }}</td>
               <td class="text-end fw-bold">{{ mat.quantityRequired }}</td>
-              <td class="text-muted">{{ mat.rawMaterialId?.unit }}</td>
+
+              <td class="text-muted">
+                {{ mat.unit || mat.rawMaterialId?.unit }}
+              </td>
             </tr>
           </tbody>
         </table>

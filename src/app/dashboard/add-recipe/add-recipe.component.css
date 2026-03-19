@@ -238,3 +238,41 @@
   min-height: 38px !important;
   border-radius: 6px !important;
 }
+::ng-deep .ng-dropdown-panel {
+  z-index: 9999 !important;
+}
+.search-select-container {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.search-input {
+  border: none !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+  border-radius: 0 !important;
+  padding: 12px;
+  box-shadow: none !important;
+}
+
+.custom-listbox {
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 5px !important;
+  outline: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+/* Style the options for better spacing */
+.custom-listbox option {
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+}
+
+.custom-listbox option:checked {
+  background-color: #e9ecef !important;
+  color: #0d6efd;
+}

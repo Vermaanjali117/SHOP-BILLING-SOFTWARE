@@ -5,12 +5,22 @@ import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoaderService } from '../../../Shared/loader.service';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatOptionModule } from '@angular/material/core';
 @Component({
   selector: 'app-row-material',
   templateUrl: './row-material.component.html',
   styleUrls: ['./row-material.component.css'],
   standalone: true,
-  imports: [AgGridModule, FormsModule, CommonModule],
+  imports: [
+    AgGridModule,
+    FormsModule,
+    CommonModule,
+    MatFormFieldModule, // Required to wrap the select
+    MatSelectModule, // The select component itself
+    MatOptionModule,
+  ],
 })
 export class RowMaterialComponent implements OnInit {
   get_row_material: any = [];
@@ -53,6 +63,7 @@ export class RowMaterialComponent implements OnInit {
     this.loader.show();
     this.service.getRawMaterial().subscribe((res: any) => {
       this.get_row_material = res.materials;
+      console.log('this.get_row_material ====', this.get_row_material);
       this.getRawMateriallist();
     });
     this.loader.hide();
@@ -82,7 +93,7 @@ export class RowMaterialComponent implements OnInit {
           const qty = p.data.quantity || 0;
           const unit = p.data.unit ? p.data.unit.toLowerCase() : 'gm';
 
-          // If it's a mass or volume >= 1000, convert to kg/ltr for better readability
+          // 1. If it's mass/volume >= 1000, convert and fix decimals
           if (
             (unit === 'gm' ||
               unit === 'kg' ||
@@ -92,16 +103,19 @@ export class RowMaterialComponent implements OnInit {
           ) {
             const displayQty = (qty / 1000).toFixed(2);
             const displayUnit = unit === 'gm' || unit === 'kg' ? 'kg' : 'ltr';
-            return `${displayQty} ${displayUnit}`;
+
+            // Remove trailing zeros (optional): 11.80 becomes 11.8
+            return `${parseFloat(displayQty)} ${displayUnit}`;
           }
 
-          // Otherwise, show as is (e.g., 500 gm or 10 pcs)
-          return `${qty} ${unit}`;
+          // 2. For smaller quantities, also fix floating point issues
+          // This handles cases like 11.800000000000004 gm
+          const fixedQty = parseFloat(qty.toFixed(2));
+          return `${fixedQty} ${unit}`;
         },
         flex: 1,
         minWidth: 120,
         cellStyle: (p: any) => {
-          // Optional: Highlight low stock in red
           const isLow = p.data.quantity <= (p.data.alertAt || 0);
           return {
             'font-weight': 'bold',
@@ -330,6 +344,7 @@ export class RowMaterialComponent implements OnInit {
     this.rawMaterial.alertAt = data.alertAt;
     this.raw_material_isEdit = true;
     this.rowmaterial_id = data._id;
+    this.rawMaterial.type = data.type;
   }
   closeAdjustStockModal() {
     this.showAdjustModal = false;

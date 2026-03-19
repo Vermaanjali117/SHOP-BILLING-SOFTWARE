@@ -6,6 +6,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoaderService } from '../../../Shared/loader.service';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatOptionModule } from '@angular/material/core';
 declare var bootstrap: any;
 
 @Component({
@@ -13,7 +16,15 @@ declare var bootstrap: any;
   templateUrl: './add-recipe.component.html',
   styleUrls: ['./add-recipe.component.css'],
   standalone: true,
-  imports: [AgGridModule, FormsModule, CommonModule, NgSelectModule],
+  imports: [
+    AgGridModule,
+    FormsModule,
+    CommonModule,
+    NgSelectModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatOptionModule,
+  ],
 })
 export class AddRecipeComponent implements OnInit {
   isEdit = false;
@@ -53,7 +64,7 @@ export class AddRecipeComponent implements OnInit {
     this.materials.push({
       rawMaterialId: null,
       quantityRequired: 0,
-      unit: 'gm', // 🔥 Always default to a unit to prevent nulls in backend
+      unit: 'gm',
     });
   }
   removeMaterial(index: number) {
@@ -93,6 +104,7 @@ export class AddRecipeComponent implements OnInit {
           // 3. Refresh the Recipe list instead of just raw materials
           // This ensures the main Ag-Grid updates with the new recipe
           this.GetSavedRecipelist_detail();
+          this.GetSavedRecipelist();
         } else {
           this.toast.warning(res.message);
         }
@@ -151,20 +163,13 @@ export class AddRecipeComponent implements OnInit {
     this.getedit_id = recipe._id;
     this.isEdit = true;
     this.selectedRecipe = recipe;
-
-    // ✅ Set selected item (Final Product)
-    // Accessing ._id safely in case the population depth varies
-    this.selectedItemId = recipe.itemId?._id || recipe.itemId;
-
-    // ✅ Prefill materials with Unit stability
+    this.selectedItemId = recipe.productId?._id || recipe.productId;
     this.materials = recipe.materials.map((mat: any) => ({
       rawMaterialId: mat.rawMaterialId?._id || mat.rawMaterialId,
       quantityRequired: mat.quantityRequired,
-      // 🔥 CRITICAL: Map the unit from the database so the dropdown shows the correct value
       unit: mat.unit || 'gm',
     }));
 
-    // ✅ Open the modal
     this.showAdjustModal = true;
   }
   onQuickFilterChanged(event: any) {
@@ -174,6 +179,11 @@ export class AddRecipeComponent implements OnInit {
     }
   }
   openAdjustStockModal() {
+    this.isEdit = false;
+    this.selectedItemId = null;
+    this.materials = [];
+    this.selectedRecipe = null;
+    this.addMaterial();
     this.showAdjustModal = true;
   }
   GetSavedRecipelist() {
@@ -282,13 +292,15 @@ export class AddRecipeComponent implements OnInit {
     this.rowData = this.get_saved_recipe;
   }
   deleteRecipe(data: any) {
-    alert('Are you sure you want to delete' + data.itemId?.name);
+    console.log('data =======', data);
+    alert('Are you sure you want to delete ' + data.productId?.name);
     this.delete_id = data._id;
     this.service.DeleteRecipe(this.delete_id).subscribe((res: any) => {
       this.get_saved_recipe = res.recipes;
       this.service.getRawMaterial().subscribe((res: any) => {
         this.get_row_material = res.materials;
       });
+      this.GetSavedRecipelist();
       this.loader.hide();
     });
   }
@@ -313,6 +325,7 @@ export class AddRecipeComponent implements OnInit {
         this.get_row_material = res.materials;
       });
       this.GetSavedRecipelist_detail();
+      this.GetSavedRecipelist();
       this.closeRecipeModal();
       this.loader.hide();
     });
