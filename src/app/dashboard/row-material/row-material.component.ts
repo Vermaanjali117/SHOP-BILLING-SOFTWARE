@@ -5,22 +5,12 @@ import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoaderService } from '../../../Shared/loader.service';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatOptionModule } from '@angular/material/core';
 @Component({
   selector: 'app-row-material',
   templateUrl: './row-material.component.html',
   styleUrls: ['./row-material.component.css'],
   standalone: true,
-  imports: [
-    AgGridModule,
-    FormsModule,
-    CommonModule,
-    MatFormFieldModule, // Required to wrap the select
-    MatSelectModule, // The select component itself
-    MatOptionModule,
-  ],
+  imports: [AgGridModule, FormsModule, CommonModule],
 })
 export class RowMaterialComponent implements OnInit {
   get_row_material: any = [];
@@ -228,7 +218,6 @@ export class RowMaterialComponent implements OnInit {
 
     // If composite → attach recipe
     if (this.rawMaterial.type === 'COMPOSITE') {
-      console.log('this.rawMaterial.type =====', this.rawMaterial.type);
       obj.outputQuantity = this.recipeOutputQuantity;
       obj.outputUnit = form.value.unit; // Pass the main unit (e.g., kg) for the premix itself
 
@@ -244,13 +233,12 @@ export class RowMaterialComponent implements OnInit {
     request.subscribe({
       next: (res: any) => {
         if (res.status == 'success') {
-          console.log('response ====', res);
           this.loader.hide();
           this.closeModal();
           this.service.getRawMaterial().subscribe((res: any) => {
             this.toast.success('Added Sucessfully');
             this.get_row_material = res.materials;
-            this.getRawMateriallist();
+            this.getdatalist();
           });
         }
 
@@ -259,11 +247,27 @@ export class RowMaterialComponent implements OnInit {
     });
   }
   // row-material.component.ts
-
+  getdatalist() {
+    this.service.getRawMaterial().subscribe((res: any) => {
+      this.get_row_material = res.materials;
+      console.log('this.get_row_material ====', this.get_row_material);
+      this.getRawMateriallist();
+    });
+  }
   openModal() {
     // CRITICAL: Reset the edit flag to false for New entries
     this.raw_material_isEdit = false;
+    // ✅ Reset form data
+    this.rawMaterial = {
+      name: '',
+      unit: '',
+      quantity: null, // 🔥 FIXED (number)
+      alertAt: null,
+      type: '',
+    };
 
+    // ✅ Clear ingredients
+    this.ingredients = [];
     // Clear any existing ID from previous edits
     this.rowmaterial_id = null;
 
@@ -337,14 +341,21 @@ export class RowMaterialComponent implements OnInit {
     this.adjuststock_id = data._id;
   }
   EditRowMaterial(data: any) {
+    console.log('data ====', data);
+
     this.showModal = true;
+
     this.rawMaterial.name = data.name;
     this.rawMaterial.unit = data.unit;
     this.rawMaterial.quantity = data.quantity;
     this.rawMaterial.alertAt = data.alertAt;
+    this.rawMaterial.type = data.type;
+
     this.raw_material_isEdit = true;
     this.rowmaterial_id = data._id;
-    this.rawMaterial.type = data.type;
+
+    // 🔥 IMPORTANT FIX
+    this.ingredients = data.ingredients || [];
   }
   closeAdjustStockModal() {
     this.showAdjustModal = false;
@@ -396,21 +407,36 @@ export class RowMaterialComponent implements OnInit {
   }
   producePremix() {
     this.loader.show();
+
     const payload = {
       premixId: this.compositedata._id,
       qty: this.produceQty,
     };
 
-    this.service.Addpremix(payload).subscribe((res: any) => {
-      alert('Premix produced successfully');
+    this.service.Addpremix(payload).subscribe({
+      next: (res: any) => {
+        alert(res?.message || 'Premix produced successfully');
 
-      this.showProduceModal = false;
-      this.service.getRawMaterial().subscribe((res: any) => {
-        this.get_row_material = res.materials;
-        this.getRawMateriallist();
+        this.showProduceModal = false;
+
+        this.service.getRawMaterial().subscribe((res: any) => {
+          this.get_row_material = res.materials;
+          this.getRawMateriallist();
+          this.loader.hide();
+        });
+      },
+      error: (err) => {
+        console.error('Produce error:', err);
+
+        const errorMessage =
+          err?.error?.message ||
+          err?.message ||
+          'Something went wrong while producing premix';
+
+        alert(errorMessage);
+
         this.loader.hide();
-      });
-      // this.getRawMaterialList(); // refresh table
+      },
     });
   }
 }

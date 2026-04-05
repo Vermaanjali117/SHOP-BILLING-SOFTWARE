@@ -102,3 +102,124 @@
   color: #be123c;
   transform: scale(1.1);
 }
+
+
+/* Header Alignment */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Search Input Styling */
+.search-input {
+  height: 42px; /* Matching button height */
+  width: 260px;
+  padding: 0 15px;
+  font-size: 0.875rem;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  outline: none;
+  background-color: #fff;
+  transition: all 0.2s ease-in-out;
+}
+
+.search-input:focus {
+  border-color: #6b4e3d;
+  box-shadow: 0 0 0 3px rgba(107, 78, 61, 0.15);
+}
+
+/* Button Styling */
+.add-btn {
+  height: 42px;
+  border-radius: 8px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Modal Styling Fixes */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1040;
+}
+
+.custom-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1050;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+/* 1. Control the width so it's not giant */
+.modal-custom-width {
+  max-width: 380px; /* Much smaller and tighter */
+}
+
+/* 2. Card styling */
+.custom-modal-card {
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+/* 3. The Label styling */
+.small-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #8898aa;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.extra-small {
+  font-size: 12px;
+}
+
+/* 4. Elegant Input (No giant blue border) */
+.elegant-input {
+  border: 1.5px solid #edf2f7;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background-color: #f8fafc;
+  transition: all 0.2s ease-in-out;
+}
+
+.elegant-input:focus {
+  background-color: #fff;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+  outline: none;
+}
+
+/* 5. Button styling */
+.btn-confirm {
+  background-color: #1a202c;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.btn-confirm:hover {
+  background-color: #2d3748;
+}
+
+.btn-link {
+  font-size: 14px;
+}

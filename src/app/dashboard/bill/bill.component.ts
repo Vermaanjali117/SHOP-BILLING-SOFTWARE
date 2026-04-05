@@ -57,6 +57,7 @@ export class BillComponent implements OnInit {
 
   ngOnInit(): void {
     this.branchId = localStorage.getItem('admin');
+    console.log("branchId =====",this.branchId);
     this.currentBranch =
       this.branches[this.branchId] || this.branches['BRANCH_ID_1'];
     console.log('this.adminid ', this.branchId);

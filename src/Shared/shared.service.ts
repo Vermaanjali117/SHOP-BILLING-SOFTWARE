@@ -5,9 +5,8 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class SharedService {
-   private apiUrl: any = 'http://localhost:3000/api';
-  // private apiUrl: any = 'https://api.thebelgiquebites.co.in/api';
-
+  //  private apiUrl: any = 'http://localhost:3000/api';
+   private apiUrl: any = '/api';
   constructor(private http: HttpClient) {}
   loginpost(sync: any) {
     return this.http.post(`${this.apiUrl}/auth/login`, sync, {

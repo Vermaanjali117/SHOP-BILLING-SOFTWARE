@@ -1,19 +1,29 @@
 <div class="flex h-screen overflow-hidden bg-gray-50">
   <aside class="w-64 bg-[#FFF8F0] text-[#5A4630] flex-shrink-0 shadow-xl z-20">
     <div class="p-6">
-      <h2 class="text-2xl font-bold mb-8 tracking-tight text-[#4a3a29]">POS Dashboard</h2>
+      <h2 class="text-2xl font-bold mb-8 tracking-tight text-[#4a3a29]">
+        POS Dashboard
+      </h2>
       <nav>
         <ul class="space-y-2 ps-0">
-          <li *ngFor="let link of [
-            { path: 'home', label: 'Home' },
-            { path: 'items', label: 'Register Product' },
-            { path: 'invoice_list', label: 'Order List' },
-            { path: 'sales_summary', label: 'Sales Summary' },
-            { path: 'row-material-management', label: 'Register Ingredient' },
-            { path: 'add_recipe', label: 'Ingredient Composition' },
-            { path: 'inventory-history', label: 'Material Audit' },
-            { path: 'analyze-performance', label: 'Analyze Performance' }
-          ]">
+          <li
+            *ngFor="
+              let link of [
+                { path: 'home', label: 'Home' },
+                { path: 'items', label: 'Register Product' },
+                { path: 'invoice_list', label: 'Order List' },
+                { path: 'sales_summary', label: 'Sales Summary' },
+                {
+                  path: 'row-material-management',
+                  label: 'Register Ingredient',
+                },
+                { path: 'add_recipe', label: 'Ingredient Composition' },
+                { path: 'manage_offers', label: 'Manage Offers' },
+                { path: 'inventory-history', label: 'Material Audit' },
+                { path: 'analyze-performance', label: 'Analyze Performance' },
+              ]
+            "
+          >
             <a
               [routerLink]="link.path"
               routerLinkActive="bg-[#FFD8A6] font-semibold text-[#5A4630]"
@@ -29,27 +39,48 @@
   </aside>
 
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-    <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-8 z-10">
-      <h1 class="text-xl font-bold text-[#5A4630]">
-        The Belgique Bites Co
-      </h1>
+    <header
+      class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-8 z-10"
+    >
+      <h1 class="text-xl font-bold text-[#5A4630]">The Belgique Bites Co</h1>
 
       <div class="flex items-center gap-6">
         <button
           (click)="toggleCart()"
           class="relative flex items-center bg-[#FFB347] text-[#5A4630] px-5 py-2 rounded-full font-semibold hover:bg-[#ffa726] transition-all shadow-sm"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 2.25h1.5l1.5 12.75h13.5l1.5-9H6.75" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 21a.75.75 0 100-1.5.75.75 0 000 1.5zM18 21a.75.75 0 100-1.5.75.75 0 000 1.5z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-5 h-5 mr-2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M2.25 2.25h1.5l1.5 12.75h13.5l1.5-9H6.75"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 21a.75.75 0 100-1.5.75.75 0 000 1.5zM18 21a.75.75 0 100-1.5.75.75 0 000 1.5z"
+            />
           </svg>
           Cart
-          <span *ngIf="showcartcount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
+          <span
+            *ngIf="showcartcount > 0"
+            class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white"
+          >
             {{ showcartcount }}
           </span>
         </button>
 
-        <button (click)="logout()" class="text-sm font-medium text-gray-500 hover:text-red-600 transition-colors">
+        <button
+          (click)="logout()"
+          class="text-sm font-medium text-gray-500 hover:text-red-600 transition-colors"
+        >
           Logout
         </button>
       </div>
@@ -59,5 +90,4 @@
       <router-outlet></router-outlet>
     </main>
   </div>
-  
-  </div>
+</div>

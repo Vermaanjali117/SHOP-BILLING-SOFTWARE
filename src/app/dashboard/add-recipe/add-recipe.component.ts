@@ -304,6 +304,7 @@ export class AddRecipeComponent implements OnInit {
     });
   }
   openRecipeModal(recipe: any) {
+    console.log('openRecipeModal recipe==', recipe);
     this.selectedRecipe = recipe;
     this.showRecipeModal = true;
   }

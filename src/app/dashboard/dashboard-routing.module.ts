@@ -13,6 +13,7 @@ import { SalessummeryComponent } from './salessummery/salessummery.component';
 import { RowMaterialComponent } from './row-material/row-material.component';
 import { AnalyzePerformanceComponent } from './analyze-performance/analyze-performance.component';
 import { InventoryHistoryComponent } from './inventory-history/inventory-history.component';
+import { ManageOffersComponent } from './manage-offers/manage-offers.component';
 
 const routes: Routes = [
   {
@@ -29,7 +30,8 @@ const routes: Routes = [
       { path: 'analyze-performance', component: AnalyzePerformanceComponent },
       { path: 'row-material-management', component: RowMaterialComponent },
       { path: 'inventory-history', component: InventoryHistoryComponent },
-         { path: 'add_recipe', component: AddRecipeComponent },
+      { path: 'manage_offers', component: ManageOffersComponent },
+      { path: 'add_recipe', component: AddRecipeComponent },
     ],
   },
 ];

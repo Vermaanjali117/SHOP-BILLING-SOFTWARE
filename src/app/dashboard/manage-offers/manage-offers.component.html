@@ -1,0 +1,209 @@
+<div class="min-h-screen bg-gray-50 p-6">
+
+  <!-- ── Header ── -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Special Offers</h1>
+      <p class="text-sm text-gray-500 mt-1">Create and manage discount offers for your billing screen</p>
+    </div>
+    <button
+      (click)="openForm()"
+      class="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+    >
+      <span class="text-lg">+</span> New Offer
+    </button>
+  </div>
+
+  <!-- ── Success / Error Messages ── -->
+  <div *ngIf="successMessage" class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center justify-between">
+    <span>{{ successMessage }}</span>
+    <button (click)="successMessage = ''" class="text-green-500 hover:text-green-700">✕</button>
+  </div>
+  <div *ngIf="errorMessage" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center justify-between">
+    <span>{{ errorMessage }}</span>
+    <button (click)="errorMessage = ''" class="text-red-500 hover:text-red-700">✕</button>
+  </div>
+
+  <!-- ── Create Offer Form ── -->
+  <div *ngIf="showForm" class="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Create New Offer</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <!-- Name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Offer Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          [(ngModel)]="form.name"
+          type="text"
+          placeholder="e.g. Happy Hours, Diwali Special"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+        />
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+        <input
+          [(ngModel)]="form.description"
+          type="text"
+          placeholder="e.g. 5PM - 8PM daily"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+        />
+      </div>
+
+      <!-- Discount Type -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Discount Type <span class="text-red-500">*</span>
+        </label>
+        <div class="flex gap-3">
+          <button
+            (click)="form.discountType = 'PERCENT'"
+            [class]="form.discountType === 'PERCENT'
+              ? 'flex-1 py-2 rounded-lg border-2 border-amber-600 bg-amber-50 text-amber-700 font-medium text-sm'
+              : 'flex-1 py-2 rounded-lg border-2 border-gray-200 text-gray-600 font-medium text-sm hover:border-gray-300'"
+          >
+            % Percent
+          </button>
+          <button
+            (click)="form.discountType = 'FLAT'"
+            [class]="form.discountType === 'FLAT'
+              ? 'flex-1 py-2 rounded-lg border-2 border-amber-600 bg-amber-50 text-amber-700 font-medium text-sm'
+              : 'flex-1 py-2 rounded-lg border-2 border-gray-200 text-gray-600 font-medium text-sm hover:border-gray-300'"
+          >
+            ₹ Flat
+          </button>
+        </div>
+      </div>
+
+      <!-- Discount Value -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          {{ form.discountType === 'PERCENT' ? 'Percentage (1-100)' : 'Amount (₹)' }}
+          <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
+            {{ form.discountType === 'PERCENT' ? '%' : '₹' }}
+          </span>
+          <input
+            [(ngModel)]="form.discountValue"
+            type="number"
+            min="1"
+            [max]="form.discountType === 'PERCENT' ? 100 : 99999"
+            placeholder="0"
+            class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex gap-3 mt-5">
+      <button
+        (click)="submitOffer()"
+        [disabled]="isSubmitting"
+        class="bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white px-6 py-2 rounded-lg font-medium text-sm transition-colors"
+      >
+        {{ isSubmitting ? 'Creating...' : 'Create Offer' }}
+      </button>
+      <button
+        (click)="closeForm()"
+        class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-2 rounded-lg font-medium text-sm transition-colors"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Loading ── -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-16">
+    <div class="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <!-- ── Empty State ── -->
+  <div *ngIf="!isLoading && offers.length === 0" class="bg-white rounded-xl border border-gray-200 py-16 text-center">
+    <div class="text-5xl mb-4">🎁</div>
+    <h3 class="text-lg font-semibold text-gray-700">No offers yet</h3>
+    <p class="text-sm text-gray-500 mt-1 mb-4">Create your first offer to use it on the billing screen</p>
+    <button
+      (click)="openForm()"
+      class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-lg text-sm font-medium"
+    >
+      + Create Offer
+    </button>
+  </div>
+
+  <!-- ── Offers List ── -->
+  <div *ngIf="!isLoading && offers.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div
+      *ngFor="let offer of offers"
+      class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow"
+    >
+      <!-- Card Header -->
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <h3 class="font-semibold text-gray-800 text-base">{{ offer.name }}</h3>
+          <p *ngIf="offer.description" class="text-xs text-gray-500 mt-0.5">{{ offer.description }}</p>
+        </div>
+        <!-- Active Badge -->
+        <span
+          [class]="offer.isActive
+            ? 'text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700'
+            : 'text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-500'"
+        >
+          {{ offer.isActive ? 'Active' : 'Inactive' }}
+        </span>
+      </div>
+
+      <!-- Discount Value Display -->
+      <div class="bg-amber-50 border border-amber-100 rounded-lg px-4 py-3 mb-4 text-center">
+        <span class="text-2xl font-bold text-amber-700">{{ getDiscountLabel(offer) }}</span>
+      </div>
+
+      <!-- Delete confirm inline -->
+      <div *ngIf="deleteConfirmId === offer._id" class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3 text-center">
+        <p class="text-sm text-red-700 mb-2">Delete this offer permanently?</p>
+        <div class="flex gap-2 justify-center">
+          <button
+            (click)="deleteOffer(offer._id)"
+            class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium"
+          >
+            Yes, Delete
+          </button>
+          <button
+            (click)="cancelDelete()"
+            class="border border-gray-300 hover:bg-gray-50 text-gray-600 px-4 py-1.5 rounded-lg text-xs font-medium"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <!-- Card Actions -->
+      <div class="flex gap-2" *ngIf="deleteConfirmId !== offer._id">
+        <!-- Toggle -->
+        <button
+          (click)="toggleOffer(offer)"
+          [class]="offer.isActive
+            ? 'flex-1 border border-gray-300 hover:bg-gray-50 text-gray-600 py-2 rounded-lg text-xs font-medium transition-colors'
+            : 'flex-1 border border-green-300 hover:bg-green-50 text-green-700 py-2 rounded-lg text-xs font-medium transition-colors'"
+        >
+          {{ offer.isActive ? 'Disable' : 'Enable' }}
+        </button>
+
+        <!-- Delete -->
+        <button
+          (click)="confirmDelete(offer._id)"
+          class="border border-red-200 hover:bg-red-50 text-red-500 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

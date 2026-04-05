@@ -6,6 +6,8 @@
   </div>
 
   <div class="cart-body flex-1 flex overflow-hidden">
+
+    <!-- ── LEFT: Cart Items ── -->
     <div class="left-col w-1/2 border-r overflow-y-auto p-4">
       <ng-container *ngIf="overalldata.length > 0; else emptyCartSmall">
         <div
@@ -15,42 +17,30 @@
           <div class="flex justify-between items-start">
             <div class="item-info">
               <p class="item-name font-medium text-gray-800">{{ item.name }}</p>
-              <p class="item-price text-sm text-gray-500">
-                ₹{{ item.price | number: "1.2-2" }}
-              </p>
-              <p class="item-total text-xs text-gray-400 mt-2">
-                Total: ₹{{ item.price * item.quantity | number: "1.2-2" }}
-              </p>
+              <p class="item-price text-sm text-gray-500">₹{{ item.price | number: "1.2-2" }}</p>
+              <p class="item-total text-xs text-gray-400 mt-2">Total: ₹{{ item.price * item.quantity | number: "1.2-2" }}</p>
             </div>
-
-            <div
-              class="qty-control flex items-center rounded-lg overflow-hidden shrink-0"
-            >
-              <button (click)="decreaseQuantity(item)" class="qty-btn">
-                −
-              </button>
-              <div class="qty-value px-3 font-semibold text-white">
-                {{ item.quantity }}
-              </div>
-              <button (click)="increaseQuantity(item)" class="qty-btn">
-                +
-              </button>
+            <div class="qty-control flex items-center rounded-lg overflow-hidden shrink-0">
+              <button (click)="decreaseQuantity(item)" class="qty-btn">−</button>
+              <div class="qty-value px-3 font-semibold text-white">{{ item.quantity }}</div>
+              <button (click)="increaseQuantity(item)" class="qty-btn">+</button>
             </div>
           </div>
         </div>
       </ng-container>
 
       <ng-template #emptyCartSmall>
-        <div
-          class="flex flex-col items-center justify-center h-full text-gray-500"
-        >
+        <div class="flex flex-col items-center justify-center h-full text-gray-500">
           <span class="text-4xl mb-2">🛒</span>
           <p>Cart is empty</p>
         </div>
       </ng-template>
     </div>
 
+    <!-- ── RIGHT: Order Details ── -->
     <div class="right-col w-1/2 overflow-y-auto p-6 space-y-4 bg-gray-50">
+
+      <!-- Customer Fields -->
       <div class="grid gap-3">
         <div class="relative">
           <label class="block text-sm font-medium text-gray-700">Phone</label>
@@ -60,7 +50,6 @@
             [(ngModel)]="customerPhone"
             (input)="onPhoneInput()"
           />
-
           <ul
             *ngIf="customerSuggestions.length > 0"
             class="absolute left-0 right-0 bg-white border rounded-xl shadow-lg mt-1 z-50"
@@ -74,83 +63,140 @@
             </li>
           </ul>
         </div>
+
         <div>
-          <label class="block text-sm font-medium text-gray-700"
-            >Customer Name</label
-          >
-          <input
-            class="input"
-            placeholder="Enter customer name"
-            [(ngModel)]="customerName"
-          />
+          <label class="block text-sm font-medium text-gray-700">Customer Name</label>
+          <input class="input" placeholder="Enter customer name" [(ngModel)]="customerName" />
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >Payment Mode</label
-            >
-            <ng-select
-              [items]="payment_mode"
-              bindLabel="value"
-              bindValue="id"
-              [(ngModel)]="paymentMode"
-              placeholder="select"
-            ></ng-select>
+            <label class="block text-sm font-medium text-gray-700">Payment Mode</label>
+            <ng-select [items]="payment_mode" bindLabel="value" bindValue="id" [(ngModel)]="paymentMode" placeholder="select"></ng-select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >Order Type</label
-            >
-            <ng-select
-              [items]="orderTypes"
-              placeholder="select"
-              bindLabel="value"
-              bindValue="id"
-              [(ngModel)]="orderType"
-            ></ng-select>
+            <label class="block text-sm font-medium text-gray-700">Order Type</label>
+            <ng-select [items]="orderTypes" placeholder="select" bindLabel="value" bindValue="id" [(ngModel)]="orderType"></ng-select>
           </div>
         </div>
       </div>
 
-      <div class="flex justify-end">
+      <!-- ── Discount Buttons ── -->
+      <div class="flex gap-2 justify-end">
+        <button
+          (click)="toggleOfferPanel()"
+          class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors"
+        >
+          🎉 {{ showOfferPanel ? 'Close Offers' : 'Special Offers' }}
+        </button>
         <button
           (click)="toggleDiscountPanel()"
-          class="px-3 py-1 bg-[#6b4e3d] text-white rounded-lg text-sm"
+          class="px-3 py-1.5 bg-[#6b4e3d] hover:bg-[#5a3f30] text-white rounded-lg text-sm font-medium transition-colors"
         >
           {{
-            showDiscountPanel
-              ? "Close Discount"
-              : discountApplied
-                ? "Edit Discount"
-                : "Apply Discount"
+            showDiscountPanel ? 'Close Discount'
+            : (discountApplied && !selectedOffer) ? 'Edit Discount'
+            : 'Apply Discount'
           }}
         </button>
       </div>
 
+      <!-- ── Applied Offer Badge ── -->
+      <div
+        *ngIf="selectedOffer"
+        class="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-4 py-3"
+      >
+        <div>
+          <p class="text-sm font-semibold text-amber-800">🎉 {{ selectedOffer.name }}</p>
+          <p class="text-xs text-amber-600 mt-0.5">
+            {{ selectedOffer.discountType === 'PERCENT' ? selectedOffer.discountValue + '% off' : '₹' + selectedOffer.discountValue + ' flat off' }}
+            · Saving ₹{{ discountAmount | number:'1.2-2' }}
+          </p>
+        </div>
+        <button
+          (click)="removeOffer()"
+          class="text-xs text-red-500 hover:text-red-700 font-medium border border-red-200 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors"
+        >
+          Remove
+        </button>
+      </div>
+
+      <!-- ── Special Offers Panel ── -->
+      <div
+        *ngIf="showOfferPanel"
+        class="bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden"
+      >
+        <!-- Panel Header -->
+        <div class="px-4 py-3 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+          <p class="text-sm font-semibold text-amber-800">🎉 Select a Special Offer</p>
+          <span *ngIf="activeOffers.length > 0" class="text-xs bg-amber-200 text-amber-800 font-semibold px-2 py-0.5 rounded-full">
+            {{ activeOffers.length }} available
+          </span>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="isLoadingOffers" class="flex justify-center py-6">
+          <div class="w-6 h-6 border-4 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+
+        <!-- No offers -->
+        <div *ngIf="!isLoadingOffers && activeOffers.length === 0" class="text-center py-6 px-4">
+          <p class="text-gray-500 text-sm">No active offers available</p>
+          <p class="text-gray-400 text-xs mt-1">Create offers from the Manage Offers page</p>
+        </div>
+
+        <!-- Offer Grid — 2 columns, scrollable -->
+        <div
+          *ngIf="!isLoadingOffers && activeOffers.length > 0"
+          class="p-3 grid grid-cols-2 gap-2 max-h-48 overflow-y-auto"
+        >
+          <button
+            *ngFor="let offer of activeOffers"
+            (click)="selectAndApplyOffer(offer)"
+            [class]="selectedOffer?._id === offer._id
+              ? 'text-left border-2 border-amber-600 bg-amber-50 rounded-xl p-3 transition-all relative'
+              : 'text-left border-2 border-gray-100 hover:border-amber-300 hover:bg-amber-50 bg-white rounded-xl p-3 transition-all relative'"
+          >
+            <!-- Selected checkmark -->
+            <span
+              *ngIf="selectedOffer?._id === offer._id"
+              class="absolute top-2 right-2 bg-amber-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
+            >✓</span>
+
+            <!-- Offer name -->
+            <p class="font-semibold text-gray-800 text-xs leading-tight pr-4">{{ offer.name }}</p>
+
+            <!-- Description -->
+            <p *ngIf="offer.description" class="text-xs text-gray-400 mt-0.5 truncate">{{ offer.description }}</p>
+
+            <!-- Discount value pill -->
+            <div class="mt-2">
+              <span
+                [class]="selectedOffer?._id === offer._id
+                  ? 'inline-block bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded-full'
+                  : 'inline-block bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full'"
+              >
+                {{ offer.discountType === 'PERCENT' ? offer.discountValue + '% off' : '₹' + offer.discountValue + ' off' }}
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Manual Discount Panel ── -->
       <div
         *ngIf="showDiscountPanel"
         class="p-4 bg-white rounded-xl border border-gray-200 shadow-sm space-y-3"
       >
         <div class="flex items-center gap-4 text-sm font-medium">
-          <label class="flex items-center gap-2 cursor-pointer"
-            ><input
-              type="radio"
-              [(ngModel)]="discountMode"
-              value="percentage"
-              (change)="onDiscountInputChange()"
-            />
-            %</label
-          >
-          <label class="flex items-center gap-2 cursor-pointer"
-            ><input
-              type="radio"
-              [(ngModel)]="discountMode"
-              value="fixed"
-              (change)="onDiscountInputChange()"
-            />
-            ₹</label
-          >
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" [(ngModel)]="discountMode" value="percentage" (change)="onDiscountInputChange()" />
+            %
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" [(ngModel)]="discountMode" value="fixed" (change)="onDiscountInputChange()" />
+            ₹
+          </label>
         </div>
         <input
           type="number"
@@ -160,44 +206,46 @@
           class="input"
         />
         <div class="flex gap-2">
-          <button (click)="applyDiscountToPreview()" class="btn-apply flex-1">
-            Apply
-          </button>
-          <button (click)="clearDiscountPreview()" class="btn-cancel flex-1">
-            Cancel
-          </button>
+          <button (click)="applyDiscountToPreview()" class="btn-apply flex-1">Apply</button>
+          <button (click)="clearDiscountPreview()" class="btn-cancel flex-1">Cancel</button>
         </div>
       </div>
 
+      <!-- ── Bill Summary ── -->
       <div class="bg-[#f3ede7] rounded-xl p-4 border border-[#e8ded3]">
         <div class="flex justify-between mb-2 text-gray-700">
           <span>Items total</span>
           <span class="font-medium">₹{{ baseTotal | number: "1.2-2" }}</span>
         </div>
+
+        <!-- Offer discount line -->
         <div
-          *ngIf="discountApplied && discountAmount > 0"
+          *ngIf="discountApplied && discountAmount > 0 && selectedOffer"
+          class="flex justify-between text-amber-700 text-sm mb-2"
+        >
+          <span>🎉 {{ selectedOffer.name }}</span>
+          <span class="font-medium">-₹{{ discountAmount | number: "1.2-2" }}</span>
+        </div>
+
+        <!-- Manual discount line -->
+        <div
+          *ngIf="discountApplied && discountAmount > 0 && !selectedOffer"
           class="flex justify-between text-green-700 text-sm mb-2"
         >
-          <span
-            >Discount
-            {{
-              discountMode === "percentage" ? "(" + discountValue + "%)" : ""
-            }}</span
-          >
-          <span class="font-medium"
-            >-₹{{ discountAmount | number: "1.2-2" }}</span
-          >
+          <span>Discount {{ discountMode === 'percentage' ? '(' + discountValue + '%)' : '' }}</span>
+          <span class="font-medium">-₹{{ discountAmount | number: "1.2-2" }}</span>
         </div>
-        <div
-          class="flex justify-between font-bold text-xl border-t border-[#dccfb5] pt-3 text-[#6b4e3d]"
-        >
+
+        <div class="flex justify-between font-bold text-xl border-t border-[#dccfb5] pt-3 text-[#6b4e3d]">
           <span>Grand Total</span>
           <span>₹{{ computedGrandTotal | number: "1.2-2" }}</span>
         </div>
       </div>
+
     </div>
   </div>
 
+  <!-- ── Footer ── -->
   <div class="cart-footer p-4 border-t bg-white flex-none">
     <button
       *ngIf="overalldata.length > 0"
@@ -207,10 +255,7 @@
     >
       Create Invoice
     </button>
-    <p
-      *ngIf="overalldata.length === 0"
-      class="text-center text-gray-400 text-sm"
-    >
+    <p *ngIf="overalldata.length === 0" class="text-center text-gray-400 text-sm">
       Add items to cart to create invoice
     </p>
   </div>

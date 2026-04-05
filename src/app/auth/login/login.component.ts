@@ -26,21 +26,40 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {}
   login() {
     this.loader.show();
-    var obj = {
+
+    const obj = {
       email: this.email,
       password: this.password,
     };
-    this.service.loginpost(obj).subscribe((res: any) => {
-      console.log(res);
-      if (res.message == 'Logged in successfully') {
-    
-        this.adminid = res.admin.branchId;
-    
-        localStorage.setItem('admin',this.adminid)
-        this.router.navigateByUrl('/dashboard/home');
-        this.toastr.success('LoggedIn Successfully');
-      }
+
+    this.service.loginpost(obj).subscribe({
+      next: (res: any) => {
+        console.log(res);
+
+        if (res?.message === 'Logged in successfully') {
+          this.adminid = res.admin.branchId;
+          localStorage.setItem('admin', this.adminid);
+
+          this.toastr.success(res.message);
+
+          this.router.navigateByUrl('/dashboard/home');
+        } else {
+          this.toastr.error('Unexpected response from server');
+        }
+
+        this.loader.hide();
+      },
+
+      error: (err) => {
+        console.error('Login error:', err);
+
+        const errorMessage =
+          err?.error?.message || err?.message || 'Login failed';
+
+        this.toastr.error(errorMessage);
+
+        this.loader.hide();
+      },
     });
-    this.loader.hide();
   }
 }
