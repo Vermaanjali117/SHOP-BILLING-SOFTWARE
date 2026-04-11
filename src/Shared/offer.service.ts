@@ -24,8 +24,8 @@ export interface CreateOfferPayload {
   providedIn: 'root',
 })
 export class OfferService {
-//   private apiUrl: any = 'http://localhost:3000/api';
-   private apiUrl: any = '/api';
+  private apiUrl: any = 'http://localhost:3000/api';
+  //  private apiUrl: any = '/api';
   constructor(private http: HttpClient) {}
 
   getAllOffers(): Observable<{ status: string; offers: Offer[] }> {

@@ -36,12 +36,16 @@ export class RowMaterialComponent implements OnInit {
   rowmaterial_id: any;
   raw_material_isEdit: boolean = false;
   adjuststock_id: any;
+  batchPreview: any = null;
+  batchPreviewLoading = false;
   rawMaterial = {
     name: '',
     unit: '',
     quantity: null,
     alertAt: null,
     type: '',
+    yieldQuantity: null as number | null,
+    yieldUnit: 'gm',
   };
   showAddStockModal: boolean = false;
   constructor(
@@ -216,14 +220,12 @@ export class RowMaterialComponent implements OnInit {
       type: this.rawMaterial.type,
     };
 
-    // If composite → attach recipe
+    // If composite → attach ingredients and yield definition
     if (this.rawMaterial.type === 'COMPOSITE') {
-      obj.outputQuantity = this.recipeOutputQuantity;
-      obj.outputUnit = form.value.unit; // Pass the main unit (e.g., kg) for the premix itself
-
-      // 🔥 Change "ingredients" to "materials" to match your backend route
-      // The 'item' already contains rawMaterialId, quantityRequired, and unit.
       obj.ingredients = this.ingredients;
+      // yieldQuantity: how much this 1 batch produces (e.g. 22 gm Dark Batter)
+      obj.yieldQuantity = this.rawMaterial.yieldQuantity;
+      obj.yieldUnit = this.rawMaterial.yieldUnit || this.rawMaterial.unit;
     }
     console.log('object ====', obj);
     const request = this.raw_material_isEdit
@@ -261,9 +263,11 @@ export class RowMaterialComponent implements OnInit {
     this.rawMaterial = {
       name: '',
       unit: '',
-      quantity: null, // 🔥 FIXED (number)
+      quantity: null,
       alertAt: null,
       type: '',
+      yieldQuantity: null, // ← add this
+      yieldUnit: 'gm', // ← add this
     };
 
     // ✅ Clear ingredients
@@ -286,7 +290,11 @@ export class RowMaterialComponent implements OnInit {
       type: '',
       quantity: null,
       alertAt: null,
+      yieldQuantity: null,
+      yieldUnit: 'gm',
     };
+    this.ingredients = [];
+    this.batchPreview = null;
   }
   closeModal() {
     this.showModal = false;
@@ -341,20 +349,19 @@ export class RowMaterialComponent implements OnInit {
     this.adjuststock_id = data._id;
   }
   EditRowMaterial(data: any) {
-    console.log('data ====', data);
-
     this.showModal = true;
+    this.raw_material_isEdit = true;
+    this.rowmaterial_id = data._id;
 
     this.rawMaterial.name = data.name;
     this.rawMaterial.unit = data.unit;
     this.rawMaterial.quantity = data.quantity;
     this.rawMaterial.alertAt = data.alertAt;
     this.rawMaterial.type = data.type;
+    // Load yield fields — these come from backend via get-row-material-list
+    this.rawMaterial.yieldQuantity = data.yieldQuantity || null;
+    this.rawMaterial.yieldUnit = data.yieldUnit || 'gm';
 
-    this.raw_material_isEdit = true;
-    this.rowmaterial_id = data._id;
-
-    // 🔥 IMPORTANT FIX
     this.ingredients = data.ingredients || [];
   }
   closeAdjustStockModal() {
@@ -399,8 +406,23 @@ export class RowMaterialComponent implements OnInit {
   }
   openProduceModal(row: any) {
     this.compositedata = row;
-
+    this.batchPreview = null;
+    this.batchPreviewLoading = true;
     this.showProduceModal = true;
+
+    // Load batch preview from backend before showing modal
+    this.service.getBatchPreview(row._id).subscribe({
+      next: (res: any) => {
+        console.log("response ===",res);
+        this.batchPreview = res.preview;
+        this.batchPreviewLoading = false;
+      },
+      error: (err: any) => {
+        this.batchPreviewLoading = false;
+        this.toast.error(err?.error?.message || 'Could not load batch preview');
+        this.showProduceModal = false;
+      },
+    });
   }
   closeProduceModal() {
     this.showProduceModal = false;
@@ -408,16 +430,17 @@ export class RowMaterialComponent implements OnInit {
   producePremix() {
     this.loader.show();
 
+    // No qty needed — backend always runs exactly 1 fixed batch
+    // and adds yieldQuantity to stock automatically
     const payload = {
       premixId: this.compositedata._id,
-      qty: this.produceQty,
     };
 
     this.service.Addpremix(payload).subscribe({
       next: (res: any) => {
-        alert(res?.message || 'Premix produced successfully');
-
+        this.toast.success(res?.message || 'Batch produced successfully');
         this.showProduceModal = false;
+        this.batchPreview = null;
 
         this.service.getRawMaterial().subscribe((res: any) => {
           this.get_row_material = res.materials;
@@ -425,16 +448,10 @@ export class RowMaterialComponent implements OnInit {
           this.loader.hide();
         });
       },
-      error: (err) => {
-        console.error('Produce error:', err);
-
+      error: (err: any) => {
         const errorMessage =
-          err?.error?.message ||
-          err?.message ||
-          'Something went wrong while producing premix';
-
-        alert(errorMessage);
-
+          err?.error?.message || 'Something went wrong while producing batch';
+        this.toast.error(errorMessage);
         this.loader.hide();
       },
     });

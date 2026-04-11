@@ -47,9 +47,9 @@
 
         <form (ngSubmit)="saveRawMaterial(f)" #f="ngForm">
           <div class="mb-3">
-            <label class="form-label text-uppercase small fw-bold text-muted"
-              >Material Name</label
-            >
+            <label class="form-label text-uppercase small fw-bold text-muted">
+              Material Name
+            </label>
             <input
               type="text"
               class="form-control"
@@ -61,9 +61,9 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label text-uppercase small fw-bold text-muted"
-              >Material Type</label
-            >
+            <label class="form-label text-uppercase small fw-bold text-muted">
+              Material Type
+            </label>
             <select
               class="form-select"
               name="type"
@@ -79,9 +79,9 @@
 
           <div class="row">
             <div class="col-6 mb-3">
-              <label class="form-label text-uppercase small fw-bold text-muted"
-                >Unit</label
-              >
+              <label class="form-label text-uppercase small fw-bold text-muted">
+                Unit
+              </label>
               <select
                 class="form-select"
                 name="unit"
@@ -96,10 +96,11 @@
                 <option value="ltr">ltr</option>
               </select>
             </div>
+
             <div class="col-6 mb-3">
-              <label class="form-label text-uppercase small fw-bold text-muted"
-                >Low Stock Alert</label
-              >
+              <label class="form-label text-uppercase small fw-bold text-muted">
+                Low Stock Alert
+              </label>
               <input
                 type="number"
                 class="form-control"
@@ -111,13 +112,10 @@
             </div>
           </div>
 
-          <div
-            class="mb-4"
-            *ngIf="!raw_material_isEdit && rawMaterial.type === 'RAW'"
-          >
-            <label class="form-label text-uppercase small fw-bold text-muted"
-              >Initial Quantity</label
-            >
+          <div class="mb-4" *ngIf="!raw_material_isEdit && rawMaterial.type === 'RAW'">
+            <label class="form-label text-uppercase small fw-bold text-muted">
+              Initial Quantity
+            </label>
             <input
               type="number"
               class="form-control"
@@ -128,12 +126,14 @@
             />
           </div>
 
+          <!-- INGREDIENTS -->
           <div *ngIf="rawMaterial.type === 'COMPOSITE'" class="mb-4">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <label
                 class="form-label text-uppercase small fw-bold text-muted mb-0"
-                >Ingredients</label
               >
+                Ingredients
+              </label>
               <button
                 type="button"
                 class="btn btn-outline-primary btn-sm"
@@ -142,6 +142,7 @@
                 + Add
               </button>
             </div>
+
             <div style="max-height: 250px; overflow-y: auto">
               <div
                 *ngFor="let item of ingredients; let i = index"
@@ -165,6 +166,7 @@
                     </ng-container>
                   </select>
                 </div>
+
                 <div class="col-3">
                   <input
                     type="number"
@@ -175,6 +177,7 @@
                     required
                   />
                 </div>
+
                 <div class="col-3">
                   <select
                     class="form-select form-select-sm"
@@ -189,6 +192,7 @@
                     <option value="pcs">pcs</option>
                   </select>
                 </div>
+
                 <div class="col-1 text-end">
                   <button
                     type="button"
@@ -202,6 +206,28 @@
             </div>
           </div>
 
+          <!-- ✅ FIXED BATCH OUTPUT -->
+          <div *ngIf="rawMaterial.type === 'COMPOSITE'" class="mb-4">
+            <label class="form-label text-uppercase small fw-bold text-muted">
+              Batch Output 
+              <span class="text-danger">*</span>
+            </label>
+
+            <p class="text-muted small mb-2">
+             
+              <strong>1 full batch</strong> 
+
+            <input
+              type="number"
+              class="form-control"
+              name="yieldQuantity"
+              [(ngModel)]="rawMaterial.yieldQuantity"
+              placeholder="22gm"
+              min="1"
+              required
+            />
+          </div>
+
           <div class="d-flex justify-content-end gap-2 pt-3 border-top">
             <button
               type="button"
@@ -210,6 +236,7 @@
             >
               Cancel
             </button>
+
             <button
               type="submit"
               class="btn btn-success px-4"
@@ -293,18 +320,23 @@
   </ng-container>
 </div>
 
-<!-- produce-modal.component.html -->
-
+<!-- Produce Batch Modal -->
 <div
   class="modal fade"
   [ngClass]="{ 'show d-block': showProduceModal }"
   tabindex="-1"
-  [style.background]="showProduceModal ? 'rgba(0,0,0,0.4)' : 'none'"
+  [style.background]="showProduceModal ? 'rgba(0,0,0,0.5)' : 'none'"
 >
-  <div class="modal-dialog modal-dialog-centered modal-custom-width">
-    <div class="modal-content custom-modal-card">
-      <div class="modal-header border-0 pb-0">
-        <h6 class="modal-title fw-bold text-dark">Produce Stock</h6>
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 420px">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px">
+      <!-- Header -->
+      <div class="modal-header border-0 pb-0 px-4 pt-4">
+        <div>
+          <h6 class="modal-title fw-bold text-dark mb-0">Produce Batch</h6>
+          <p class="text-muted small mb-0">
+            {{ compositedata?.name }}
+          </p>
+        </div>
         <button
           type="button"
           class="btn-close shadow-none"
@@ -312,34 +344,79 @@
         ></button>
       </div>
 
-      <div class="modal-body py-3">
-        <label class="small-label">QUANTITY TO PRODUCE</label>
-        <input
-          type="number"
-          class="form-control elegant-input"
-          [(ngModel)]="produceQty"
-          placeholder="0.00"
-          min="0"
-        />
-        <p class="text-muted extra-small mt-2">
-          Adjusting stock for: <strong>Premix</strong>
-        </p>
+      <!-- Body -->
+      <div class="modal-body px-4 py-3">
+        <!-- Loading state -->
+        <div *ngIf="batchPreviewLoading" class="text-center py-3">
+          <div
+            class="spinner-border spinner-border-sm text-secondary"
+            role="status"
+          ></div>
+          <p class="text-muted small mt-2 mb-0">Loading batch details...</p>
+        </div>
+
+        <!-- Batch preview loaded -->
+        <ng-container *ngIf="!batchPreviewLoading && batchPreview">
+          <!-- What goes IN -->
+          <p
+            class="text-uppercase fw-bold small text-muted mb-2"
+            style="letter-spacing: 0.05em"
+          >
+            Will consume
+          </p>
+          <div
+            class="rounded-3 p-3 mb-3"
+            style="background: #f8fafc; border: 1px solid #e2e8f0"
+          >
+            <div
+              *ngFor="let ing of batchPreview.ingredients"
+              class="d-flex justify-content-between align-items-center mb-1"
+            >
+              <span class="text-dark small">{{ ing.name }}</span>
+              <span class="fw-semibold small text-danger">
+                − {{ ing.required }} {{ ing.unit }}
+              </span>
+            </div>
+          </div>
+
+          <!-- What comes OUT -->
+          <p
+            class="text-uppercase fw-bold small text-muted mb-2"
+            style="letter-spacing: 0.05em"
+          >
+            Will produce
+          </p>
+          <div
+            class="rounded-3 p-3 d-flex justify-content-between align-items-center"
+            style="background: #f0fdf4; border: 1px solid #bbf7d0"
+          >
+            <span class="text-dark small fw-semibold">{{
+              batchPreview.materialName
+            }}</span>
+            <span class="fw-bold text-success">
+              + {{ batchPreview.yieldQuantity }} {{ batchPreview.yieldUnit }}
+            </span>
+          </div>
+        </ng-container>
       </div>
 
-      <div class="modal-footer border-0 pt-0 justify-content-end">
+      <!-- Footer -->
+      <div class="modal-footer border-0 px-4 pb-4 pt-0 gap-2">
         <button
           type="button"
-          class="btn btn-link text-decoration-none text-muted fw-semibold me-2"
+          class="btn btn-light border fw-semibold px-4"
           (click)="closeProduceModal()"
         >
-          Discard
+          Cancel
         </button>
         <button
           type="button"
-          class="btn btn-dark btn-confirm px-4"
+          class="btn btn-dark px-4 fw-semibold"
+          style="border-radius: 10px"
+          [disabled]="batchPreviewLoading || !batchPreview"
           (click)="producePremix()"
         >
-          Update Stock
+          Confirm Produce
         </button>
       </div>
     </div>

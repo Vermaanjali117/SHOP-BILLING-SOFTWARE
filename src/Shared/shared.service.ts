@@ -5,8 +5,8 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class SharedService {
-  //  private apiUrl: any = 'http://localhost:3000/api';
-   private apiUrl: any = '/api';
+  private apiUrl: any = 'http://localhost:3000/api';
+  //  private apiUrl: any = '/api';
   constructor(private http: HttpClient) {}
   loginpost(sync: any) {
     return this.http.post(`${this.apiUrl}/auth/login`, sync, {
@@ -186,6 +186,12 @@ export class SharedService {
         params, // ✅ THIS WAS MISSING
         withCredentials: true,
       },
+    );
+  }
+  getBatchPreview(premixId: string) {
+    return this.http.get(
+      `http://localhost:3000/api/raw-materials/batch-preview/${premixId}`,
+      { withCredentials: true },
     );
   }
 }
