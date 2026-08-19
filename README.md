@@ -1,27 +1,39 @@
-# POSSYSTEM
+# Cafe Billing Frontend (POS System)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.11.
+Angular front end for the Cafe Billing Backend, a point-of-sale dashboard used to take orders, apply offers, and print bills across multiple café branches.
 
-## Development server
+## What it does
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Login and auth flow guarded by route guards, so unauthenticated users can't reach the dashboard
+- Dashboard for browsing menu items and building an order
+- Applying offers and discounts at checkout
+- Triggering bill and receipt printing through the backend
+- Branch-aware views so staff only see their own branch's stock and orders
 
-## Code scaffolding
+## Tech used
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Angular 15
+- Angular Router with route guards for auth-protected pages
+- REST API integration with the billing-backend service
 
-## Build
+## Project structure
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- auth/ — Login and authentication
+- dashboard/ — Order-taking, billing, and offers UI
+- guards/ — Route guards for protected pages
 
-## Running unit tests
+## Running it locally
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+You'll need Node.js and the Angular CLI installed, and the billing-backend API running.
 
-## Running end-to-end tests
+- Clone the repo and run npm install
+- Run ng serve
+- Open http://localhost:4200/
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Related repo
 
-## Further help
+Backend API: [billing-backend](https://github.com/Vermaanjali117/billing-backend)
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Author
+
+Anjali Verma — [GitHub](https://github.com/Vermaanjali117)
