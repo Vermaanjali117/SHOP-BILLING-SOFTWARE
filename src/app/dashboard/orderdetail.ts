@@ -23,10 +23,12 @@ export type Order = {
   subTotal: number;
   handling: number;
   grandTotal: number;
-    ordertype:string;
-      discountAmount?: number;   
+  ordertype: string;
+  discountAmount?: number;
   discountType?: 'percentage' | 'fixed' | null;
-  discountValue?: number;      
+  discountValue?: number;
   discountReason?: string | null;
-
+  gstIncluded?: boolean;
+  gstRate?: number;
+  gstAmount?: number;
 };

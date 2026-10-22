@@ -236,6 +236,21 @@
           <span class="font-medium">-₹{{ discountAmount | number: "1.2-2" }}</span>
         </div>
 
+        <label class="flex items-center justify-between gap-3 mb-2 text-sm text-gray-700">
+          <span>GST included (5%)</span>
+          <input
+            type="checkbox"
+            [(ngModel)]="gstIncluded"
+            (change)="recalculateComputedTotal()"
+            class="h-4 w-4 accent-[#a35a2b]"
+          />
+        </label>
+
+        <div *ngIf="gstIncluded" class="flex justify-between text-gray-700 text-sm mb-2">
+          <span>GST (5%)</span>
+          <span class="font-medium">₹{{ gstAmount | number: "1.2-2" }}</span>
+        </div>
+
         <div class="flex justify-between font-bold text-xl border-t border-[#dccfb5] pt-3 text-[#6b4e3d]">
           <span>Grand Total</span>
           <span>₹{{ computedGrandTotal | number: "1.2-2" }}</span>

@@ -51,7 +51,6 @@
 
   <!-- Totals -->
   <div class="text-[12px]">
-    <!-- Discount Row (only when discount present) -->
     <div
       *ngIf="order_detail.discountAmount && order_detail.discountAmount > 0"
       class="flex justify-between mb-1"
@@ -66,6 +65,11 @@
         </ng-container>
       </span>
       <span>-₹{{ order_detail.discountAmount || 0 | number: "1.2-2" }}</span>
+    </div>
+
+    <div *ngIf="order_detail.gstIncluded !== false" class="flex justify-between mb-1">
+      <span>GST ({{ order_detail.gstRate || 5 }}%)</span>
+      <span>₹{{ order_detail.gstAmount || 0 | number: "1.2-2" }}</span>
     </div>
 
     <p class="flex justify-between font-bold text-[13px] mt-1">

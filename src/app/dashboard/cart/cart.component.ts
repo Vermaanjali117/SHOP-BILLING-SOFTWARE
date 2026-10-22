@@ -48,6 +48,11 @@ export class CartComponent implements OnInit {
   discountApplied: boolean = false;
   computedGrandTotal: number = 0;
 
+  // ── GST ──
+  gstIncluded: boolean = true;
+  gstRate: number = 5;
+  gstAmount: number = 0;
+
   // ── Offers ──
   showOfferPanel = false;
   activeOffers: Offer[] = [];
@@ -223,8 +228,14 @@ export class CartComponent implements OnInit {
 
   recalculateComputedTotal() {
     const base = this.computeBaseTotal();
-    const after = base - (this.discountApplied ? this.discountAmount : 0);
-    this.computedGrandTotal = +Math.max(0, after).toFixed(2);
+    const discount = this.discountApplied ? this.discountAmount : 0;
+    const subtotalAfterDiscount = Math.max(0, base - discount);
+
+    this.gstAmount = this.gstIncluded
+      ? +((subtotalAfterDiscount * this.gstRate) / 100).toFixed(2)
+      : 0;
+
+    this.computedGrandTotal = +(subtotalAfterDiscount + this.gstAmount).toFixed(2);
   }
 
   // ─────────────────────────────────────────────
@@ -255,9 +266,12 @@ export class CartComponent implements OnInit {
     );
 
     const subTotal = items.reduce((s, it) => s + it.total, 0);
-    const grandTotal = this.discountApplied
-      ? this.computedGrandTotal
-      : subTotal;
+    const discountAmount = this.discountApplied ? this.discountAmount : 0;
+    const discountedSubtotal = Math.max(0, subTotal - discountAmount);
+    const gstAmount = this.gstIncluded
+      ? +((discountedSubtotal * this.gstRate) / 100).toFixed(2)
+      : 0;
+    const grandTotal = +(discountedSubtotal + gstAmount).toFixed(2);
 
     const newOrder: any = {
       orderNumber: 'INV-' + Date.now(),
@@ -267,13 +281,16 @@ export class CartComponent implements OnInit {
       paymentMode: this.paymentMode,
       ordertype: this.orderType,
       items,
-      subTotal,
+      subTotal: discountedSubtotal,
       handling: 0,
       grandTotal,
-      discountAmount: this.discountApplied ? this.discountAmount : 0,
+      discountAmount,
       discountType: this.discountApplied ? this.discountMode : null,
       discountValue: this.discountApplied ? this.discountValue : 0,
       discountReason: this.discountApplied ? this.discountReason : null,
+      gstIncluded: this.gstIncluded,
+      gstRate: this.gstRate,
+      gstAmount,
       // offer fields — null if manual discount was used
       appliedOfferId: this.selectedOffer ? this.selectedOffer._id : null,
       appliedOfferName: this.selectedOffer ? this.selectedOffer.name : null,

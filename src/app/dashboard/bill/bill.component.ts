@@ -25,6 +25,16 @@ export class BillComponent implements OnInit {
       subtitle: 'Riddhi Enterprises',
       address: 'Gooba Garden Crossing, Metro pillor no -16 IIT kanpur',
     },
+        '6ada3835c258ef239e98357e': {
+      name: 'THE BELGIQUE BITES CO',
+      subtitle: 'Simran Enterprises',
+      address: ' Benajhabar Rd, Motilal Swaroop Nagar, Harsh Nagar kanpur',
+    },
+        '6ada3997ac5a9079479c08f8': {
+      name: 'THE BELGIQUE BITES CO',
+      subtitle: 'test Enterprises',
+      address: 'test branch IIT kanpur',
+    },
   };
   orderId: string | null = null;
   adminid: any;
@@ -44,6 +54,9 @@ export class BillComponent implements OnInit {
     discountType: null,
     discountValue: 0,
     discountReason: null,
+    gstIncluded: true,
+    gstRate: 5,
+    gstAmount: 0,
   };
   order_items: any[] = [];
 
@@ -57,7 +70,6 @@ export class BillComponent implements OnInit {
 
   ngOnInit(): void {
     this.branchId = localStorage.getItem('admin');
-    console.log("branchId =====",this.branchId);
     this.currentBranch =
       this.branches[this.branchId] || this.branches['BRANCH_ID_1'];
     console.log('this.adminid ', this.branchId);
@@ -83,30 +95,33 @@ export class BillComponent implements OnInit {
         this.order_detail = order;
         this.order_items = Array.isArray(order.items) ? order.items : [];
 
-        // 1️⃣ Convert all fields to numbers to avoid string concatenation
         const discountAmount = Number(order.discountAmount || 0);
         const discountValue = Number(order.discountValue || 0);
+        const gstIncluded = order.gstIncluded !== false;
+        const gstRate = Number(order.gstRate || 5);
 
-        // 2️⃣ Calculate Gross Total (the 150)
         const calculatedSubTotal = this.order_items.reduce(
           (acc, item) => acc + Number(item.price || 0) * Number(item.qty || 0),
           0,
         );
 
-        // 3️⃣ FORCE THE MATH: Grand Total = Subtotal - Discount
-        // We don't trust order.grandTotal here because it might be old data
-        const calculatedGrandTotal = calculatedSubTotal - discountAmount;
+        const discountedSubtotal = Math.max(0, calculatedSubTotal - discountAmount);
+        const gstAmount = gstIncluded ? +((discountedSubtotal * gstRate) / 100).toFixed(2) : 0;
+        const calculatedGrandTotal = +(discountedSubtotal + gstAmount).toFixed(2);
 
-        // 4️⃣ Assign back to the object for the HTML to see
-        this.order_detail.grossTotal = calculatedSubTotal; // For the "Gross Total" row
+        this.order_detail.grossTotal = calculatedSubTotal;
         this.order_detail.subTotal = calculatedSubTotal;
         this.order_detail.discountAmount = discountAmount;
         this.order_detail.discountValue = discountValue;
+        this.order_detail.gstIncluded = gstIncluded;
+        this.order_detail.gstRate = gstRate;
+        this.order_detail.gstAmount = gstAmount;
         this.order_detail.grandTotal = calculatedGrandTotal;
 
         console.log('Math Check:', {
           gross: this.order_detail.grossTotal,
           discount: this.order_detail.discountAmount,
+          gst: this.order_detail.gstAmount,
           net: this.order_detail.grandTotal,
         });
       },
