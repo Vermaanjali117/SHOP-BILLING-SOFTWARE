@@ -1,26 +1,159 @@
-/* Smooth hide/show for sidebar */
-aside {
-  transition: all 0.3s ease-in-out;
-}
-button.disabled-btn {
-  cursor: not-allowed; /* shows prohibited sign */
-  opacity: 0.6;        /* visually looks disabled */
-}
-/* Ensure sidebar links don't look like standard blue links */
-aside a {
-  text-decoration: none !important;
-  color: inherit;
+.sidebar-container {
+  background-color: #FFFDF7;
+  border-right: 1px solid #EFE7DA;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-aside {
-  transition: width 0.3s ease-in-out;
+/* Brand Header */
+.sidebar-header {
+  height: 64px;
+  border-bottom: 1px solid #EFE7DA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-/* Custom scrollbar for a cleaner look */
-main::-webkit-scrollbar {
-  width: 6px;
+.sidebar-logo {
+  height: 44px;
+  width: 44px;
+  object-fit: contain;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.18);
+  transition: transform 0.2s ease;
 }
-main::-webkit-scrollbar-thumb {
-  background-color: #e2e8f0;
+
+.sidebar-logo:hover {
+  transform: scale(1.05);
+}
+
+/* Navigation Groups */
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: #EFE7DA transparent;
+}
+
+.group-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #9A7B56;
+  text-transform: uppercase;
+  padding-left: 8px;
+  margin-bottom: 3px;
+  display: block;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6.5px 10px;
   border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #4A3A28;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.nav-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  stroke: #6B5540;
+  transition: stroke 0.2s ease;
+}
+
+.nav-link:hover {
+  background: #FDF3E5;
+  color: #C2410C;
+  transform: translateX(2px);
+}
+
+.nav-link:hover .nav-icon {
+  stroke: #C2410C;
+}
+
+/* Active Nav Pill */
+.active-nav-pill {
+  background: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35) !important;
+  font-weight: 800 !important;
+}
+
+.active-nav-pill .nav-icon {
+  stroke: #FFFFFF !important;
+}
+
+/* Top Navbar */
+.top-navbar {
+  background-color: #FFFDF7;
+  border-bottom: 1px solid #EFE7DA;
+}
+
+.brand-heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2D1F12;
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+
+.cart-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(90deg, #F59E0B 0%, #EA580C 100%);
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+  transition: all 0.2s;
+}
+
+.cart-pill-btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.cart-badge-count {
+  background: #1E1711;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 9999px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+}
+
+.logout-pill-btn {
+  background: #ffffff;
+  border: 1px solid #E5D5C5;
+  color: #352518;
+  padding: 7px 20px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-pill-btn:hover {
+  background: #FDF3E5;
+  border-color: #D4A373;
+  color: #C2410C;
 }

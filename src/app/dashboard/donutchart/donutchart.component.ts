@@ -1,77 +1,151 @@
-import { Component, OnInit, ElementRef, ViewChild, Input } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  Input,
+  AfterViewInit,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+} from '@angular/core';
 import * as echarts from 'echarts';
+
 @Component({
   selector: 'app-donutchart',
   standalone: true,
   templateUrl: './donutchart.component.html',
   styleUrls: ['./donutchart.component.css'],
 })
-export class DonutchartComponent implements OnInit {
+export class DonutchartComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('donutChart', { static: true }) donutChart!: ElementRef;
 
-  @Input() data: any[] = [];
-  ngOnInit(): void {
-    this.renderChart();
-  }
-  renderChart() {
-    const chartDom = this.donutChart.nativeElement;
-    const myChart = echarts.init(chartDom);
+  @Input() data: Array<{ name: string; value: number }> = [];
+  @Input() title: string = 'Payment Split';
 
-    const option = {
+  private chart?: echarts.ECharts;
+
+  private colorMap: Record<string, string> = {
+    Cash: '#EA580C', // Vibrant orange
+    UPI: '#292524',  // Deep espresso charcoal
+    Card: '#E5D5C5', // Warm tan/cream
+    Other: '#A89988',
+  };
+
+  ngAfterViewInit(): void {
+    this.initChart();
+    window.addEventListener('resize', this.onResize);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data'] && this.chart) {
+      this.updateChart();
+    }
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('resize', this.onResize);
+    this.chart?.dispose();
+  }
+
+  private onResize = () => {
+    this.chart?.resize();
+  };
+
+  private initChart(): void {
+    const chartDom = this.donutChart.nativeElement;
+    this.chart = echarts.init(chartDom);
+    this.updateChart();
+    setTimeout(() => this.chart?.resize(), 100);
+  }
+
+  private updateChart(): void {
+    if (!this.chart) return;
+
+    const chartData = (this.data || []).map((item) => ({
+      name: item.name,
+      value: item.value || 0,
+      itemStyle: {
+        color: this.colorMap[item.name] || undefined,
+      },
+    }));
+
+    const option: echarts.EChartsOption = {
       tooltip: {
         trigger: 'item',
+        formatter: (params: any) => {
+          const val = Number(params.value || 0).toLocaleString('en-IN');
+          return `<b>${params.name}</b><br/>Revenue: ₹${val} (${params.percent}%)`;
+        },
       },
       legend: {
-        top: '5%',
-        left: 'center',
+        show: false,
       },
-
-      // DONUT CHART CONFIG
       series: [
         {
-          name: 'Category Revenue',
+          name: this.title,
           type: 'pie',
-          radius: ['40%', '70%'], // inner & outer radius (makes donut)
-          avoidLabelOverlap: false,
-
+          radius: '72%',
+          center: ['50%', '50%'],
+          avoidLabelOverlap: true,
           itemStyle: {
-            borderRadius: 10,
-            borderColor: '#fff',
+            borderRadius: 6,
+            borderColor: '#ffffff',
             borderWidth: 2,
           },
-
           label: {
-            show: false,
-            position: 'center',
-          },
-
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: '16',
-              fontWeight: 'bold',
+            show: true,
+            position: 'outside',
+            formatter: (params: any) => {
+              if (!params.value || params.value === 0) return '';
+              const val = Number(params.value).toLocaleString('en-IN');
+              return `{b|${params.name}}\n{v|₹${val}} {p|(${params.percent}%)}`;
+            },
+            rich: {
+              b: {
+                fontSize: 13,
+                fontWeight: 700,
+                color: '#1E1711',
+                lineHeight: 18,
+              },
+              v: {
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#786657',
+                lineHeight: 16,
+              },
+              p: {
+                fontSize: 12,
+                fontWeight: 800,
+                color: '#EA580C',
+                lineHeight: 16,
+              },
             },
           },
-
           labelLine: {
-            show: false,
+            show: true,
+            length: 12,
+            length2: 14,
+            smooth: 0.2,
+            lineStyle: {
+              width: 1.5,
+              color: '#D4C3B3',
+            },
           },
-
-          data: [
-            { value: 55, name: 'Waffles' },
-            { value: 25, name: 'Shakes' },
-            { value: 15, name: 'Ice Cream' },
-            { value: 5, name: 'Cheesecakes' },
-          ],
+          emphasis: {
+            scale: true,
+            scaleSize: 6,
+            itemStyle: {
+              shadowBlur: 14,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.2)',
+            },
+          },
+          data: chartData.length > 0 ? chartData : [{ name: 'No Data', value: 0 }],
         },
       ],
     };
 
-    myChart.setOption(option);
-
-    // Responsive
-    window.addEventListener('resize', () => {
-      myChart.resize();
-    });
+    this.chart.setOption(option, true);
+    setTimeout(() => this.chart?.resize(), 50);
   }
 }

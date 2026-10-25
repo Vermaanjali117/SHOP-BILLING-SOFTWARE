@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 export interface Offer {
   _id: string;
@@ -25,7 +26,7 @@ export interface CreateOfferPayload {
 })
 export class OfferService {
   // private apiUrl: any = 'http://localhost:3000/api';
-    private apiUrl: any = '/api';
+  private apiUrl: any = environment.apiUrl || '/api';
   constructor(private http: HttpClient) {}
 
   getAllOffers(): Observable<{ status: string; offers: Offer[] }> {

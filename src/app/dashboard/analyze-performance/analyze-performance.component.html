@@ -1,86 +1,185 @@
-<div class="dashboard-container">
-  <header class="dashboard-header">
-    <div class="header-text">
-      <h5 class="paddingcustom">Overall business insights (Last 7 Days)</h5>
+<div class="analyze-page-container">
+  <!-- PAGE HEADER & FILTER PILLS -->
+  <header class="page-header flex justify-between items-end flex-wrap gap-2 mb-2.5">
+    <div class="title-group">
+      <span class="category-badge">GROW</span>
+      <h1 class="main-title font-heading-bebas">ANALYZE PERFORMANCE</h1>
+      <p class="subtitle font-serif-italic">Revenue, orders and materials used at a glance.</p>
     </div>
 
-    <div class="filter-controls">
-      <div class="date-group">
-        <div class="input-wrapper">
-          <label>From</label>
-          <input type="date" [(ngModel)]="fromDate" />
-        </div>
-        <div class="input-wrapper">
-          <label>To</label>
-          <input type="date" [(ngModel)]="toDate" />
-        </div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-apply" (click)="applyDateFilter()">Apply</button>
-        <button class="btn btn-secondary" (click)="resetToLast7Days()">
-          Last 7 Days
-        </button>
-      </div>
+    <!-- Quick Date Filter Pills -->
+    <div class="period-filter-pills flex items-center gap-2">
+      <button
+        class="filter-pill"
+        [class.active-pill]="selectedPeriod === 'today'"
+        (click)="setPeriod('today')"
+      >
+        TODAY
+      </button>
+      <button
+        class="filter-pill"
+        [class.active-pill]="selectedPeriod === '7days'"
+        (click)="setPeriod('7days')"
+      >
+        7 DAYS
+      </button>
+      <button
+        class="filter-pill"
+        [class.active-pill]="selectedPeriod === '30days'"
+        (click)="setPeriod('30days')"
+      >
+        30 DAYS
+      </button>
     </div>
   </header>
 
-  <div class="kpi-grid">
-    <div class="kpi-card revenue-card">
-      <div class="kpi-icon">₹</div>
-      <div class="kpi-content">
-        <span class="kpi-label">Revenue</span>
-        <h2 class="kpi-value">₹ {{ totalRevenue | number }}</h2>
-        <span class="kpi-sub">Overall Earnings</span>
+  <!-- 3 KPI CARDS -->
+  <div class="kpi-grid grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-2.5">
+    <!-- Revenue -->
+    <div class="cafe-kpi-card">
+      <div class="kpi-icon-badge">₹</div>
+      <div class="kpi-info">
+        <span class="kpi-label">REVENUE</span>
+        <h2 class="kpi-num font-heading-bebas">₹{{ totalRevenue | number }}</h2>
       </div>
     </div>
 
-    <div class="kpi-card transactions-card">
-      <div class="kpi-icon">📦</div>
-      <div class="kpi-content">
-        <span class="kpi-label">Transactions</span>
-        <h2 class="kpi-value">{{ totalOrders }}</h2>
-        <span class="kpi-sub"
-          >AOV: ₹ {{ totalRevenue / totalOrders || 0 | number: "1.0-0" }}</span
-        >
+    <!-- Orders -->
+    <div class="cafe-kpi-card">
+      <div class="kpi-icon-badge">#</div>
+      <div class="kpi-info">
+        <span class="kpi-label">ORDERS</span>
+        <h2 class="kpi-num font-heading-bebas">{{ totalOrders }}</h2>
       </div>
     </div>
 
-    <div class="kpi-card consumption-card">
-      <div class="kpi-icon">⚖️</div>
-      <div class="kpi-content">
-        <span class="kpi-label">Total Consumption</span>
-        <h2 class="kpi-value">{{ totalConsumption | number }}</h2>
-        <span class="kpi-sub">Raw material (gm)</span>
+    <!-- Material Used -->
+    <div class="cafe-kpi-card">
+      <div class="kpi-icon-badge">g</div>
+      <div class="kpi-info">
+        <span class="kpi-label">MATERIAL USED</span>
+        <h2 class="kpi-num font-heading-bebas">{{ totalConsumption | number }} GM</h2>
       </div>
     </div>
   </div>
 
-  <section class="chart-section">
-    <div class="section-header">
-      <h3>Revenue Timeline</h3>
-      <span class="trend-tag">Daily revenue trend</span>
+  <!-- CHARTS ROW: Revenue Bar Chart & Payment Split Donut -->
+  <div class="charts-row grid grid-cols-1 lg:grid-cols-12 gap-3.5 mb-2.5">
+    <!-- Revenue Bar Chart (6 Cols) -->
+    <div class="chart-card lg:col-span-6">
+      <div class="card-heading-box">
+        <h3 class="card-heading font-heading-bebas">
+          REVENUE, {{ selectedPeriod === 'today' ? 'TODAY' : selectedPeriod === '30days' ? 'LAST 30 DAYS' : 'LAST 7 DAYS' }}
+        </h3>
+      </div>
+      <div class="chart-wrap">
+        <app-barchart [data]="revenueSeries"></app-barchart>
+      </div>
     </div>
-    <div class="chart-container">
-      <app-linechart [data]="revenueSeries"></app-linechart>
-    </div>
-  </section>
 
-  <section class="table-section">
-    <div class="section-header">
-      <h3>Raw Material Consumption</h3>
-      <span>Usage breakdown by item</span>
+    <!-- Payment Split Solid Pie Chart & Parallel Bottom Legends (6 Cols) -->
+    <div class="chart-card lg:col-span-6 flex flex-col justify-between">
+      <div class="card-heading-box flex justify-between items-center">
+        <h3 class="card-heading font-heading-bebas">PAYMENT SPLIT</h3>
+        <span class="text-[11px] font-bold text-[#8C7A6B] uppercase tracking-wider">Mode Breakdown</span>
+      </div>
+
+      <!-- Solid Pie Chart (Centered Horizontally & Vertically) -->
+      <div class="chart-wrap-pie">
+        <app-donutchart [data]="paymentSeries" title="Payment Split"></app-donutchart>
+      </div>
+
+      <!-- Parallel Legends at Bottom (3 Columns) -->
+      <div class="grid grid-cols-3 gap-2.5 mt-2 pt-2.5 border-t border-[#F5EFE6]">
+        <!-- Cash -->
+        <div class="pay-stat-pill-bottom p-2 rounded-xl bg-[#FFFDF9] border border-[#FEEBC8]">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#EA580C]"></span>
+              <span class="text-xs font-bold text-[#1E1711]">Cash</span>
+            </div>
+            <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#FFEDD5] text-[#EA580C]">
+              {{ getPaymentPct('Cash') }}%
+            </span>
+          </div>
+          <div class="text-base font-bold font-heading-bebas text-[#1E1711] leading-tight">
+            ₹{{ paymentStats.cash | number: '1.0-0' }}
+          </div>
+        </div>
+
+        <!-- UPI -->
+        <div class="pay-stat-pill-bottom p-2 rounded-xl bg-[#FAF9F7] border border-[#EFECE8]">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#292524]"></span>
+              <span class="text-xs font-bold text-[#1E1711]">UPI</span>
+            </div>
+            <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#E7E5E4] text-[#292524]">
+              {{ getPaymentPct('UPI') }}%
+            </span>
+          </div>
+          <div class="text-base font-bold font-heading-bebas text-[#1E1711] leading-tight">
+            ₹{{ paymentStats.upi | number: '1.0-0' }}
+          </div>
+        </div>
+
+        <!-- Card -->
+        <div class="pay-stat-pill-bottom p-2 rounded-xl bg-[#FFFFFF] border border-[#F0E6D8]">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#D6C7B2]"></span>
+              <span class="text-xs font-bold text-[#786657]">Card</span>
+            </div>
+            <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#F5EFE6] text-[#786657]">
+              {{ getPaymentPct('Card') }}%
+            </span>
+          </div>
+          <div class="text-base font-bold font-heading-bebas text-[#786657] leading-tight">
+            ₹{{ paymentStats.card | number: '1.0-0' }}
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="grid-wrapper">
-      <ag-grid-angular
-        (gridReady)="onGridReady($event)"
-        style="width: 100%; height: 350px"
-        [rowData]="rowData"
-        [columnDefs]="columnDefs"
-        [pagination]="true"
-        [paginationPageSize]="10"
-        class="ag-theme-alpine custom-grid"
-      >
-      </ag-grid-angular>
+  </div>
+
+  <!-- RAW MATERIALS USED TABLE CARD -->
+  <div class="raw-materials-card">
+    <div class="card-heading-box no-border">
+      <h3 class="card-heading font-heading-bebas mb-3">RAW MATERIALS USED</h3>
     </div>
-  </section>
+
+    <div class="materials-table-wrap">
+      <div class="table-head-row grid grid-cols-12 px-5 py-2.5">
+        <div class="col-span-5 table-th">MATERIAL</div>
+        <div class="col-span-3 table-th">USED</div>
+        <div class="col-span-4 table-th">SHARE</div>
+      </div>
+
+      <div class="table-body">
+        <ng-container *ngIf="consumptionList.length > 0; else noMaterials">
+          <div
+            *ngFor="let item of consumptionList"
+            class="material-row grid grid-cols-12 items-center px-5 py-3.5 border-t border-[#F5EFE6]"
+          >
+            <div class="col-span-5 font-bold text-[#1E1711] text-sm">{{ item.name }}</div>
+            <div class="col-span-3 text-[#4A3A28] text-sm font-medium">{{ item.totalUsed }} {{ item.unit }}</div>
+            <div class="col-span-4 flex items-center pr-4">
+              <div class="share-progress-track flex-1">
+                <div
+                  class="share-progress-fill"
+                  [style.width.%]="item.sharePct || 5"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #noMaterials>
+          <div class="px-5 py-8 text-center text-[#8C7A6B] text-sm">
+            No raw material consumption recorded for this period.
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
 </div>

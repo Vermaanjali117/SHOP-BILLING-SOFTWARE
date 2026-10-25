@@ -1,277 +1,297 @@
-<div class="flex flex-col h-screen bg-white overflow-hidden">
-  <div class="cart-header px-5 py-1 border-b flex-none">
-    <h2 class="text-lg font-semibold text-gray-800">
-      My Cart ({{ overalldata.length }})
-    </h2>
-  </div>
+<div class="cart-page-container">
+  <!-- PAGE HEADER (Compact) -->
+  <header class="page-header mb-3">
+    <span class="category-badge">REVIEW & PAY</span>
+    <h1 class="main-title font-heading-bebas">CART</h1>
+    <p class="subtitle font-serif-italic">
+      {{ (activeOffers && activeOffers.length > 0) ? 'Check the items, pick an offer, then settle the bill.' : 'Review items, enter customer details, then settle the bill.' }}
+    </p>
+  </header>
 
-  <div class="cart-body flex-1 flex overflow-hidden">
+  <!-- TWO-COLUMN LAYOUT -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <!-- ── LEFT COLUMN (7 COLS): ORDER ITEMS & SPECIAL OFFERS ── -->
+    <div class="lg:col-span-7 space-y-4">
+      <!-- Card 1: ORDER ITEMS -->
+      <div class="cafe-card">
+        <h2 class="card-heading font-heading-bebas">ORDER ITEMS</h2>
 
-    <!-- ── LEFT: Cart Items ── -->
-    <div class="left-col w-1/2 border-r overflow-y-auto p-4">
-      <ng-container *ngIf="overalldata.length > 0; else emptyCartSmall">
-        <div
-          *ngFor="let item of overalldata"
-          class="item-row pb-4 border-b last:border-b-0 mb-4"
-        >
-          <div class="flex justify-between items-start">
-            <div class="item-info">
-              <p class="item-name font-medium text-gray-800">{{ item.name }}</p>
-              <p class="item-price text-sm text-gray-500">₹{{ item.price | number: "1.2-2" }}</p>
-              <p class="item-total text-xs text-gray-400 mt-2">Total: ₹{{ item.price * item.quantity | number: "1.2-2" }}</p>
-            </div>
-            <div class="qty-control flex items-center rounded-lg overflow-hidden shrink-0">
-              <button (click)="decreaseQuantity(item)" class="qty-btn">−</button>
-              <div class="qty-value px-3 font-semibold text-white">{{ item.quantity }}</div>
-              <button (click)="increaseQuantity(item)" class="qty-btn">+</button>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-
-      <ng-template #emptyCartSmall>
-        <div class="flex flex-col items-center justify-center h-full text-gray-500">
-          <span class="text-4xl mb-2">🛒</span>
-          <p>Cart is empty</p>
-        </div>
-      </ng-template>
-    </div>
-
-    <!-- ── RIGHT: Order Details ── -->
-    <div class="right-col w-1/2 overflow-y-auto p-6 space-y-4 bg-gray-50">
-
-      <!-- Customer Fields -->
-      <div class="grid gap-3">
-        <div class="relative">
-          <label class="block text-sm font-medium text-gray-700">Phone</label>
-          <input
-            class="input"
-            placeholder="Enter phone number"
-            [(ngModel)]="customerPhone"
-            (input)="onPhoneInput()"
-          />
-          <ul
-            *ngIf="customerSuggestions.length > 0"
-            class="absolute left-0 right-0 bg-white border rounded-xl shadow-lg mt-1 z-50"
-          >
-            <li
-              *ngFor="let c of customerSuggestions"
-              class="px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm"
-              (click)="selectCustomer(c)"
+        <div class="items-list space-y-2 mt-3">
+          <ng-container *ngIf="overalldata.length > 0; else emptyCartState">
+            <div
+              *ngFor="let item of overalldata"
+              class="cart-item-row flex items-center justify-between py-2 border-b border-[#F5EFE6] last:border-b-0"
             >
-              <strong>{{ c.phone }}</strong> — {{ c.customerName }}
-            </li>
-          </ul>
-        </div>
+              <!-- Thumbnail & Info -->
+              <div class="flex items-center gap-3 flex-1 min-w-0 pr-3">
+                <div class="item-thumb flex-shrink-0">
+                  <span>🍰</span>
+                </div>
+                <div class="item-text min-w-0">
+                  <h4 class="item-name truncate">{{ item.name }}</h4>
+                  <span class="item-unit-price">₹{{ item.price | number: '1.0-0' }} each</span>
+                </div>
+              </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Customer Name</label>
-          <input class="input" placeholder="Enter customer name" [(ngModel)]="customerName" />
-        </div>
+              <!-- Quantity Pill Counter -->
+              <div class="qty-pill flex items-center gap-1.5">
+                <button
+                  type="button"
+                  (click)="decreaseQuantity(item)"
+                  class="qty-btn"
+                >
+                  −
+                </button>
+                <span class="qty-count">{{ item.quantity }}</span>
+                <button
+                  type="button"
+                  (click)="increaseQuantity(item)"
+                  class="qty-btn"
+                >
+                  +
+                </button>
+              </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Payment Mode</label>
-            <ng-select [items]="payment_mode" bindLabel="value" bindValue="id" [(ngModel)]="paymentMode" placeholder="select"></ng-select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Order Type</label>
-            <ng-select [items]="orderTypes" placeholder="select" bindLabel="value" bindValue="id" [(ngModel)]="orderType"></ng-select>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Discount Buttons ── -->
-      <div class="flex gap-2 justify-end">
-        <button
-          (click)="toggleOfferPanel()"
-          class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors"
-        >
-          🎉 {{ showOfferPanel ? 'Close Offers' : 'Special Offers' }}
-        </button>
-        <button
-          (click)="toggleDiscountPanel()"
-          class="px-3 py-1.5 bg-[#6b4e3d] hover:bg-[#5a3f30] text-white rounded-lg text-sm font-medium transition-colors"
-        >
-          {{
-            showDiscountPanel ? 'Close Discount'
-            : (discountApplied && !selectedOffer) ? 'Edit Discount'
-            : 'Apply Discount'
-          }}
-        </button>
-      </div>
-
-      <!-- ── Applied Offer Badge ── -->
-      <div
-        *ngIf="selectedOffer"
-        class="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-4 py-3"
-      >
-        <div>
-          <p class="text-sm font-semibold text-amber-800">🎉 {{ selectedOffer.name }}</p>
-          <p class="text-xs text-amber-600 mt-0.5">
-            {{ selectedOffer.discountType === 'PERCENT' ? selectedOffer.discountValue + '% off' : '₹' + selectedOffer.discountValue + ' flat off' }}
-            · Saving ₹{{ discountAmount | number:'1.2-2' }}
-          </p>
-        </div>
-        <button
-          (click)="removeOffer()"
-          class="text-xs text-red-500 hover:text-red-700 font-medium border border-red-200 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors"
-        >
-          Remove
-        </button>
-      </div>
-
-      <!-- ── Special Offers Panel ── -->
-      <div
-        *ngIf="showOfferPanel"
-        class="bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden"
-      >
-        <!-- Panel Header -->
-        <div class="px-4 py-3 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
-          <p class="text-sm font-semibold text-amber-800">🎉 Select a Special Offer</p>
-          <span *ngIf="activeOffers.length > 0" class="text-xs bg-amber-200 text-amber-800 font-semibold px-2 py-0.5 rounded-full">
-            {{ activeOffers.length }} available
-          </span>
-        </div>
-
-        <!-- Loading -->
-        <div *ngIf="isLoadingOffers" class="flex justify-center py-6">
-          <div class="w-6 h-6 border-4 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-
-        <!-- No offers -->
-        <div *ngIf="!isLoadingOffers && activeOffers.length === 0" class="text-center py-6 px-4">
-          <p class="text-gray-500 text-sm">No active offers available</p>
-          <p class="text-gray-400 text-xs mt-1">Create offers from the Manage Offers page</p>
-        </div>
-
-        <!-- Offer Grid — 2 columns, scrollable -->
-        <div
-          *ngIf="!isLoadingOffers && activeOffers.length > 0"
-          class="p-3 grid grid-cols-2 gap-2 max-h-48 overflow-y-auto"
-        >
-          <button
-            *ngFor="let offer of activeOffers"
-            (click)="selectAndApplyOffer(offer)"
-            [class]="selectedOffer?._id === offer._id
-              ? 'text-left border-2 border-amber-600 bg-amber-50 rounded-xl p-3 transition-all relative'
-              : 'text-left border-2 border-gray-100 hover:border-amber-300 hover:bg-amber-50 bg-white rounded-xl p-3 transition-all relative'"
-          >
-            <!-- Selected checkmark -->
-            <span
-              *ngIf="selectedOffer?._id === offer._id"
-              class="absolute top-2 right-2 bg-amber-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
-            >✓</span>
-
-            <!-- Offer name -->
-            <p class="font-semibold text-gray-800 text-xs leading-tight pr-4">{{ offer.name }}</p>
-
-            <!-- Description -->
-            <p *ngIf="offer.description" class="text-xs text-gray-400 mt-0.5 truncate">{{ offer.description }}</p>
-
-            <!-- Discount value pill -->
-            <div class="mt-2">
-              <span
-                [class]="selectedOffer?._id === offer._id
-                  ? 'inline-block bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded-full'
-                  : 'inline-block bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full'"
-              >
-                {{ offer.discountType === 'PERCENT' ? offer.discountValue + '% off' : '₹' + offer.discountValue + ' off' }}
-              </span>
+              <!-- Line Total -->
+              <div class="item-total-price font-heading-bebas pl-4 flex-shrink-0">
+                ₹{{ item.price * item.quantity | number: '1.0-0' }}
+              </div>
             </div>
+          </ng-container>
+
+          <ng-template #emptyCartState>
+            <div class="py-8 text-center text-[#8C7A6B]">
+              <span class="text-3xl block mb-1.5">🛒</span>
+              <p class="font-medium text-xs">Your cart is currently empty.</p>
+              <a
+                routerLink="/dashboard/home"
+                class="inline-block mt-2 px-4 py-1.5 rounded-full text-xs font-bold bg-[#F59E0B] text-white no-underline shadow-sm"
+              >
+                Go to Menu
+              </a>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Card 2: SPECIAL OFFERS (Only shown when active offers are available) -->
+      <div class="cafe-card" *ngIf="activeOffers && activeOffers.length > 0">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="card-heading font-heading-bebas m-0">SPECIAL OFFERS</h2>
+          <button
+            *ngIf="selectedOffer"
+            (click)="removeOffer()"
+            class="text-xs font-bold text-red-600 hover:underline"
+          >
+            Remove Offer
           </button>
         </div>
-      </div>
 
-      <!-- ── Manual Discount Panel ── -->
-      <div
-        *ngIf="showDiscountPanel"
-        class="p-4 bg-white rounded-xl border border-gray-200 shadow-sm space-y-3"
-      >
-        <div class="flex items-center gap-4 text-sm font-medium">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" [(ngModel)]="discountMode" value="percentage" (change)="onDiscountInputChange()" />
-            %
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" [(ngModel)]="discountMode" value="fixed" (change)="onDiscountInputChange()" />
-            ₹
-          </label>
-        </div>
-        <input
-          type="number"
-          [(ngModel)]="discountValue"
-          (input)="onDiscountInputChange()"
-          placeholder="Value"
-          class="input"
-        />
-        <div class="flex gap-2">
-          <button (click)="applyDiscountToPreview()" class="btn-apply flex-1">Apply</button>
-          <button (click)="clearDiscountPreview()" class="btn-cancel flex-1">Cancel</button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div
+            *ngFor="let offer of activeOffers"
+            (click)="selectAndApplyOffer(offer)"
+            class="offer-item-card"
+            [class.active-offer]="selectedOffer?._id === offer._id"
+          >
+            <div class="flex justify-between items-start">
+              <h4 class="offer-title">{{ offer.name }}</h4>
+              <span class="offer-tag font-bold">
+                {{ offer.discountType === 'PERCENT' ? offer.discountValue + '% OFF' : '₹' + offer.discountValue + ' OFF' }}
+              </span>
+            </div>
+            <p class="offer-desc">{{ offer.description || (offer.discountType === 'PERCENT' ? 'Percentage off on bill' : 'Flat rupee discount') }}</p>
+          </div>
         </div>
       </div>
-
-      <!-- ── Bill Summary ── -->
-      <div class="bg-[#f3ede7] rounded-xl p-4 border border-[#e8ded3]">
-        <div class="flex justify-between mb-2 text-gray-700">
-          <span>Items total</span>
-          <span class="font-medium">₹{{ baseTotal | number: "1.2-2" }}</span>
-        </div>
-
-        <!-- Offer discount line -->
-        <div
-          *ngIf="discountApplied && discountAmount > 0 && selectedOffer"
-          class="flex justify-between text-amber-700 text-sm mb-2"
-        >
-          <span>🎉 {{ selectedOffer.name }}</span>
-          <span class="font-medium">-₹{{ discountAmount | number: "1.2-2" }}</span>
-        </div>
-
-        <!-- Manual discount line -->
-        <div
-          *ngIf="discountApplied && discountAmount > 0 && !selectedOffer"
-          class="flex justify-between text-green-700 text-sm mb-2"
-        >
-          <span>Discount {{ discountMode === 'percentage' ? '(' + discountValue + '%)' : '' }}</span>
-          <span class="font-medium">-₹{{ discountAmount | number: "1.2-2" }}</span>
-        </div>
-
-        <label class="flex items-center justify-between gap-3 mb-2 text-sm text-gray-700">
-          <span>GST included (5%)</span>
-          <input
-            type="checkbox"
-            [(ngModel)]="gstIncluded"
-            (change)="recalculateComputedTotal()"
-            class="h-4 w-4 accent-[#a35a2b]"
-          />
-        </label>
-
-        <div *ngIf="gstIncluded" class="flex justify-between text-gray-700 text-sm mb-2">
-          <span>GST (5%)</span>
-          <span class="font-medium">₹{{ gstAmount | number: "1.2-2" }}</span>
-        </div>
-
-        <div class="flex justify-between font-bold text-xl border-t border-[#dccfb5] pt-3 text-[#6b4e3d]">
-          <span>Grand Total</span>
-          <span>₹{{ computedGrandTotal | number: "1.2-2" }}</span>
-        </div>
-      </div>
-
     </div>
-  </div>
 
-  <!-- ── Footer ── -->
-  <div class="cart-footer p-4 border-t bg-white flex-none">
-    <button
-      *ngIf="overalldata.length > 0"
-      [disabled]="!customerName || !customerPhone || !paymentMode || !orderType"
-      (click)="CreateInvoice()"
-      class="btn-create w-full py-2 shadow-md transition-all active:scale-[0.98]"
-    >
-      Create Invoice
-    </button>
-    <p *ngIf="overalldata.length === 0" class="text-center text-gray-400 text-sm">
-      Add items to cart to create invoice
-    </p>
+    <!-- ── RIGHT COLUMN (5 COLS): CUSTOMER DETAILS & BILL SUMMARY ── -->
+    <div class="lg:col-span-5 space-y-3.5">
+      <!-- Customer Information Card -->
+      <div class="cafe-card">
+        <h3 class="text-[11px] font-bold text-[#8C7A6B] uppercase tracking-wider mb-2">Customer Information</h3>
+        <div class="space-y-2">
+          <!-- Phone input with autocomplete -->
+          <div class="relative">
+            <label class="block text-[11px] font-bold text-[#4A3A28] mb-0.5">PHONE NUMBER</label>
+            <input
+              class="cafe-input"
+              placeholder="e.g. 9876543210"
+              [(ngModel)]="customerPhone"
+              (input)="onPhoneInput()"
+            />
+            <ul
+              *ngIf="customerSuggestions.length > 0"
+              class="absolute left-0 right-0 bg-white border border-[#EFE7DA] rounded-xl shadow-xl mt-1 z-50 overflow-hidden"
+            >
+              <li
+                *ngFor="let c of customerSuggestions"
+                class="px-3 py-1.5 cursor-pointer hover:bg-[#FDF3E5] text-xs text-[#2D1F12] border-b border-[#F5EFE6] last:border-b-0"
+                (click)="selectCustomer(c)"
+              >
+                <strong>{{ c.phone }}</strong> — {{ c.customerName }}
+              </li>
+            </ul>
+          </div>
+
+          <!-- Customer Name -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#4A3A28] mb-0.5">CUSTOMER NAME</label>
+            <input
+              class="cafe-input"
+              placeholder="Customer Name"
+              [(ngModel)]="customerName"
+            />
+          </div>
+
+          <!-- Order Type Selector -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#4A3A28] mb-0.5">ORDER TYPE</label>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                (click)="selectOrderType('Dine')"
+                class="flex-1 py-1 px-3 rounded-lg text-xs font-bold border transition-all"
+                [ngClass]="orderType === 'Dine' ? 'bg-[#291E14] text-white border-[#291E14]' : 'bg-white text-[#4A3A28] border-[#E5D5C5] hover:bg-[#FDF3E5]'"
+              >
+                Dine In
+              </button>
+              <button
+                type="button"
+                (click)="selectOrderType('Take Away')"
+                class="flex-1 py-1 px-3 rounded-lg text-xs font-bold border transition-all"
+                [ngClass]="orderType === 'Take Away' ? 'bg-[#291E14] text-white border-[#291E14]' : 'bg-white text-[#4A3A28] border-[#E5D5C5] hover:bg-[#FDF3E5]'"
+              >
+                Take Away
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: BILL SUMMARY -->
+      <div class="cafe-card">
+        <h2 class="card-heading font-heading-bebas">BILL SUMMARY</h2>
+
+        <div class="space-y-1.5 mt-2.5 text-xs">
+          <div class="flex justify-between text-[#6B5540]">
+            <span>Items total</span>
+            <span class="font-bold text-[#1E1711]">₹{{ baseTotal | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-[#6B5540]">
+            <span>Includes GST (5%)</span>
+            <span class="font-bold text-[#1E1711]">₹{{ gstAmount | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-[#6B5540]" *ngIf="discountAmount > 0">
+            <span>Discount ({{ discountReason || 'Applied' }})</span>
+            <span class="font-bold text-green-700">−₹{{ discountAmount | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-[#6B5540]" *ngIf="discountAmount === 0">
+            <span>Discount</span>
+            <span class="font-bold text-[#1E1711]">−₹0.00</span>
+          </div>
+
+          <div class="border-t border-[#F0E6D8] pt-2 flex justify-between items-baseline">
+            <span class="font-heading-bebas text-base text-[#1E1711]">GRAND TOTAL</span>
+            <span class="grand-total-val font-heading-bebas">₹{{ computedGrandTotal | number: '1.0-0' }}</span>
+          </div>
+        </div>
+
+        <!-- Payment Mode Toggle Pills (CASH, UPI, CARD) -->
+        <div class="payment-mode-pills flex gap-2 mt-3.5">
+          <button
+            type="button"
+            (click)="selectPaymentMode('Cash')"
+            class="pay-pill"
+            [class.active-pay]="paymentMode === 'Cash'"
+          >
+            CASH
+          </button>
+          <button
+            type="button"
+            (click)="selectPaymentMode('UPI')"
+            class="pay-pill"
+            [class.active-pay]="paymentMode === 'UPI'"
+          >
+            UPI
+          </button>
+          <button
+            type="button"
+            (click)="selectPaymentMode('Card')"
+            class="pay-pill"
+            [class.active-pay]="paymentMode === 'Card'"
+          >
+            CARD
+          </button>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-3.5 space-y-2">
+          <button
+            type="button"
+            (click)="CreateInvoice()"
+            [disabled]="overalldata.length === 0"
+            class="create-invoice-btn"
+          >
+            CREATE INVOICE
+          </button>
+
+          <button
+            type="button"
+            (click)="toggleDiscountPanel()"
+            class="apply-discount-btn"
+          >
+            {{ discountApplied ? 'EDIT DISCOUNT' : 'APPLY DISCOUNT' }}
+          </button>
+        </div>
+
+        <!-- Inline Discount Panel -->
+        <div *ngIf="showDiscountPanel" class="mt-4 p-4 bg-[#FBF7F0] border border-[#EFE7DA] rounded-xl space-y-3">
+          <h4 class="text-xs font-bold text-[#1E1711] uppercase tracking-wider">Manual Discount</h4>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              (click)="discountMode = 'percentage'; onDiscountInputChange()"
+              class="flex-1 py-1 rounded text-xs font-bold border"
+              [ngClass]="discountMode === 'percentage' ? 'bg-[#C2410C] text-white border-[#C2410C]' : 'bg-white border-[#E5D5C5] text-[#4A3A28]'"
+            >
+              Percentage (%)
+            </button>
+            <button
+              type="button"
+              (click)="discountMode = 'fixed'; onDiscountInputChange()"
+              class="flex-1 py-1 rounded text-xs font-bold border"
+              [ngClass]="discountMode === 'fixed' ? 'bg-[#C2410C] text-white border-[#C2410C]' : 'bg-white border-[#E5D5C5] text-[#4A3A28]'"
+            >
+              Flat Amount (₹)
+            </button>
+          </div>
+          <input
+            type="number"
+            class="cafe-input text-sm"
+            [placeholder]="discountMode === 'percentage' ? 'Enter percentage (e.g. 10)' : 'Enter amount (e.g. 50)'"
+            [(ngModel)]="discountValue"
+            (input)="onDiscountInputChange()"
+          />
+          <div class="flex justify-end gap-2 pt-1">
+            <button
+              type="button"
+              (click)="clearDiscountPreview(); showDiscountPanel = false"
+              class="px-3 py-1 rounded text-xs font-bold text-gray-500 hover:text-red-600"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              (click)="applyDiscountToPreview()"
+              class="px-4 py-1.5 rounded-full text-xs font-bold bg-[#C2410C] text-white"
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

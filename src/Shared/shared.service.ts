@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 })
 export class SharedService {
   // private apiUrl: any = 'http://localhost:3000/api';
-  private apiUrl: any = '/api';
+  private apiUrl: any = environment.apiUrl || '/api';
   constructor(private http: HttpClient) {}
   loginpost(sync: any) {
     return this.http.post(`${this.apiUrl}/auth/login`, sync, {

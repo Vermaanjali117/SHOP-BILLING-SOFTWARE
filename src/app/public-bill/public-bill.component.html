@@ -1,0 +1,111 @@
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-screen">
+  <div class="spinner"></div>
+  <p>Loading your bill...</p>
+</div>
+
+<!-- Error State -->
+<div *ngIf="error && !loading" class="error-screen">
+  <div class="error-icon">🧾</div>
+  <h2>Bill Not Found</h2>
+  <p>This bill link may be invalid or expired.</p>
+</div>
+
+<!-- Bill -->
+<div *ngIf="!loading && !error && order" class="page-wrapper">
+  <div class="bill-card">
+
+    <!-- Header -->
+    <div class="bill-header">
+      <img src="assets/logo.png" alt="The Belgique Bites Co" class="brand-logo" />
+      <h1 class="brand-name">{{ currentBranch?.name || 'THE BELGIQUE BITES CO' }}</h1>
+      <p class="brand-sub" *ngIf="currentBranch?.subtitle">{{ currentBranch?.subtitle }}</p>
+      <p class="brand-address" *ngIf="currentBranch?.address">{{ currentBranch?.address }}</p>
+    </div>
+
+    <div class="divider-dashed"></div>
+
+    <!-- Order Info -->
+    <div class="order-meta">
+      <div class="meta-row">
+        <span class="meta-label">Order No</span>
+        <span class="meta-value">{{ order.orderNumber }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Token</span>
+        <span class="meta-value token-badge">#{{ order.tokenNumber }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Date</span>
+        <span class="meta-value">{{ order.date | date: 'dd MMM yyyy, hh:mm a' }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Customer</span>
+        <span class="meta-value">{{ order.customerName }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Phone</span>
+        <span class="meta-value">{{ order.phone }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Payment</span>
+        <span class="meta-value pay-badge">{{ order.paymentMode }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Order Type</span>
+        <span class="meta-value">{{ order.ordertype }}</span>
+      </div>
+    </div>
+
+    <div class="divider-dashed"></div>
+
+    <!-- Items Table -->
+    <div class="items-section">
+      <div class="items-header">
+        <span class="col-item">Item</span>
+        <span class="col-qty">Qty</span>
+        <span class="col-price">Price</span>
+        <span class="col-total">Total</span>
+      </div>
+      <div class="item-row" *ngFor="let item of items">
+        <span class="col-item item-name">{{ item.name }}</span>
+        <span class="col-qty item-qty">{{ item.qty }}</span>
+        <span class="col-price item-price">₹{{ item.price | number: '1.2-2' }}</span>
+        <span class="col-total item-total">₹{{ (item.price * item.qty) | number: '1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="divider-dashed"></div>
+
+    <!-- Totals -->
+    <div class="totals-section">
+      <div class="total-row" *ngIf="order.discountAmount > 0">
+        <span>
+          Discount
+          <span *ngIf="order.discountType === 'percentage'">({{ order.discountValue }}%)</span>
+          <span *ngIf="order.discountType === 'fixed'">(₹{{ order.discountValue | number:'1.2-2' }})</span>
+        </span>
+        <span class="discount-val">-₹{{ order.discountAmount | number: '1.2-2' }}</span>
+      </div>
+      <div class="total-row">
+        <span>Includes GST ({{ order.gstRate || 5 }}%)</span>
+        <span>₹{{ gstAmount | number: '1.2-2' }}</span>
+      </div>
+      <div class="total-row grand">
+        <span>Grand Total</span>
+        <span>₹{{ grandTotal | number: '1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bill-footer">
+      <p class="thank-you-text">🙏 Thank you for visiting! We'd love to see you again.</p>
+      <div class="footer-links">
+        <a href="https://thebelgiquebitesco.in" target="_blank">🌐 thebelgiquebitesco.in</a>
+        <a href="https://www.instagram.com/thebelgiquebitesco_iit" target="_blank">📸 @thebelgiquebitesco_iit</a>
+      </div>
+      <p class="tagline">~ The Belgique Bites Co ~</p>
+    </div>
+
+  </div>
+</div>

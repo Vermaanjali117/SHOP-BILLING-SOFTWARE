@@ -1,8 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { PublicBillComponent } from './public-bill/public-bill.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
+
+  // Public bill — no login required
+  { path: 'public-bill/:id', component: PublicBillComponent },
 
   // login (auth module)
   {

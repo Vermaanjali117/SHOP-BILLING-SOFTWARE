@@ -16,6 +16,9 @@ export class CustomerComponent implements OnInit {
   order_detail: any = [];
   order_items: any = [];
   showbillreciept: boolean = false;
+  allowedDeleteBranchId = '695755832c76b65a570b1abb';
+  currentBranchId: string | null = null;
+
   constructor(
     public service: SharedService,
     public loader: LoaderService,
@@ -26,6 +29,7 @@ export class CustomerComponent implements OnInit {
   rowData: any = [];
 
   ngOnInit(): void {
+    this.currentBranchId = localStorage.getItem('admin');
     this.loader.show();
     this.service.getbilllist().subscribe((res: any) => {
       this.orderlist = res.orders;
@@ -78,29 +82,30 @@ export class CustomerComponent implements OnInit {
         sortable: false,
         filter: false,
       },
-      {
-        headerName: 'Delete',
-        cellRenderer: (params: any) => {
-          const button = document.createElement('button');
-          button.className =
-            'flex items-center justify-center text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 rounded-full w-8 h-8 transition';
-          button.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    `;
+      ...(this.currentBranchId === this.allowedDeleteBranchId
+        ? [{
+            headerName: 'Delete',
+            cellRenderer: (params: any) => {
+              const button = document.createElement('button');
+              button.className =
+                'flex items-center justify-center text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 rounded-full w-8 h-8 transition';
+              button.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        `;
 
-          // Add click event to call Angular delete function
-          button.addEventListener('click', () => {
-            this.deleteorder(params.data);
-          });
+              button.addEventListener('click', () => {
+                this.deleteorder(params.data);
+              });
 
-          return button;
-        },
-        width: 100,
-        sortable: false,
-        filter: false,
-      },
+              return button;
+            },
+            width: 100,
+            sortable: false,
+            filter: false,
+          }]
+        : []),
     ];
     this.rowData = this.orderlist;
   }

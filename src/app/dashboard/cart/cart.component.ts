@@ -77,22 +77,17 @@ export class CartComponent implements OnInit {
       this.recalculateComputedTotal();
     });
 
-    this.recalculateComputedTotal();
+    if (!this.paymentMode) this.paymentMode = 'Cash';
+    if (!this.orderType) this.orderType = 'Dine';
+    this.loadActiveOffers();
+  }
 
-    const draftdata: any = localStorage.getItem('editingOrder');
-    const finaldraftdata = JSON.parse(draftdata);
-    if (finaldraftdata) {
-      this.customerName = finaldraftdata.customerName;
-      this.customerPhone = finaldraftdata.phone;
-      this.paymentMode = finaldraftdata.paymentMode;
-      this.orderType = finaldraftdata.ordertype;
-      this.discountMode = finaldraftdata.discountType ?? null;
-      this.discountValue = Number(finaldraftdata.discountValue ?? 0);
-      this.discountAmount = Number(finaldraftdata.discountAmount ?? 0);
-      this.discountApplied = this.discountAmount > 0;
-      this.computeDiscountPreview();
-      this.recalculateComputedTotal();
-    }
+  selectPaymentMode(mode: string): void {
+    this.paymentMode = mode;
+  }
+
+  selectOrderType(type: string): void {
+    this.orderType = type;
   }
 
   // ─────────────────────────────────────────────
@@ -112,12 +107,15 @@ export class CartComponent implements OnInit {
     this.isLoadingOffers = true;
     this.offerService.getActiveOffers().subscribe({
       next: (res) => {
-        this.activeOffers = res.offers;
+        this.activeOffers =
+          res && Array.isArray(res.offers)
+            ? res.offers.filter((o) => o && o.isActive !== false)
+            : [];
         this.isLoadingOffers = false;
       },
       error: () => {
         this.isLoadingOffers = false;
-        this.toast.error('Failed to load offers');
+        this.activeOffers = [];
       },
     });
   }
@@ -231,11 +229,10 @@ export class CartComponent implements OnInit {
     const discount = this.discountApplied ? this.discountAmount : 0;
     const subtotalAfterDiscount = Math.max(0, base - discount);
 
-    this.gstAmount = this.gstIncluded
-      ? +((subtotalAfterDiscount * this.gstRate) / 100).toFixed(2)
-      : 0;
-
-    this.computedGrandTotal = +(subtotalAfterDiscount + this.gstAmount).toFixed(2);
+    // GST (5%) is inclusive in menu price — grand total equals discounted menu price
+    const taxableBase = +(subtotalAfterDiscount / (1 + this.gstRate / 100)).toFixed(2);
+    this.gstAmount = +(subtotalAfterDiscount - taxableBase).toFixed(2);
+    this.computedGrandTotal = +subtotalAfterDiscount.toFixed(2);
   }
 
   // ─────────────────────────────────────────────
@@ -268,10 +265,11 @@ export class CartComponent implements OnInit {
     const subTotal = items.reduce((s, it) => s + it.total, 0);
     const discountAmount = this.discountApplied ? this.discountAmount : 0;
     const discountedSubtotal = Math.max(0, subTotal - discountAmount);
-    const gstAmount = this.gstIncluded
-      ? +((discountedSubtotal * this.gstRate) / 100).toFixed(2)
-      : 0;
-    const grandTotal = +(discountedSubtotal + gstAmount).toFixed(2);
+
+    // GST (5%) is inclusive in menu price
+    const taxableBase = +(discountedSubtotal / (1 + this.gstRate / 100)).toFixed(2);
+    const gstAmount = +(discountedSubtotal - taxableBase).toFixed(2);
+    const grandTotal = +discountedSubtotal.toFixed(2);
 
     const newOrder: any = {
       orderNumber: 'INV-' + Date.now(),

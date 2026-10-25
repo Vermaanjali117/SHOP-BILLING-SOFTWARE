@@ -1,59 +1,58 @@
 <!-- Customer Invoice -->
-<div id="customer-copy" class="w-[300px] mx-auto text-black">
+<div id="customer-copy" class="receipt-paper w-[260px] mx-auto text-black">
   <!-- Company Header -->
-  <div class="text-center mb-2">
-    <h4 class="text-[18px] font-extrabold uppercase tracking-wide">
-      {{ currentBranch.name }}
+  <div class="text-center mb-1">
+    <h4 class="text-[16px] font-extrabold uppercase tracking-wide">
+      {{ currentBranch?.name || 'THE BELGIQUE BITES CO' }}
     </h4>
-    <p class="text-[13px] font-semibold">
-      {{ currentBranch.subtitle }}
+    <p class="text-[12px] font-semibold" *ngIf="currentBranch?.subtitle">
+      {{ currentBranch?.subtitle }}
     </p>
-    <p class="text-[10px] leading-tight max-w-[250px] mx-auto">
-      {{ currentBranch.address }}
-    </p>
-    <p class="text-[11px] mt-1">
-      --------------------------------------------------
+    <p class="text-[10px] leading-tight max-w-[220px] mx-auto" *ngIf="currentBranch?.address">
+      {{ currentBranch?.address }}
     </p>
   </div>
 
-  <!-- Invoie Info -->
-  <div class="mb-2 text-[10px] invoice-info">
-    <p><b>Order No:</b> {{ order_detail.orderNumber }}</p>
-    <p><b>Token:</b> {{ order_detail.tokenNumber }}</p>
-    <p><b>Date:</b> {{ order_detail.date | date: "dd/MM/yyyy" }}</p>
-    <p><b>Customer:</b> {{ order_detail.customerName }}</p>
-    <p><b>Phone:</b> {{ order_detail.phone }}</p>
-    <p><b>Payment:</b> {{ order_detail.paymentMode }}</p>
-    <p><b>Order Type:</b> {{ order_detail.ordertype }}</p>
+  <div class="divider-dashed"></div>
+
+  <!-- Invoice Middle Info (Left-aligned as shown in bill) -->
+  <div class="invoice-info text-left text-[11px] space-y-0.5 my-1">
+    <div><span>Order No: </span><span class="font-semibold">{{ order_detail.orderNumber }}</span></div>
+    <div><span>Token: </span><span class="font-bold">{{ order_detail.tokenNumber }}</span></div>
+    <div><span>Date: </span><span>{{ order_detail.date | date: "dd/MM/yyyy" }}</span></div>
+    <div><span>Customer: </span><span class="font-semibold">{{ order_detail.customerName }}</span></div>
+    <div><span>Phone: </span><span>{{ order_detail.phone }}</span></div>
+    <div><span>Payment: </span><span class="font-semibold">{{ order_detail.paymentMode }}</span></div>
+    <div><span>Order Type: </span><span class="font-semibold">{{ order_detail.ordertype }}</span></div>
   </div>
 
-  <p class="text-[11px]">--------------------------------------------------</p>
+  <div class="divider-dashed"></div>
 
-  <!-- Items -->
-  <table class="w-full text-[12px]">
+  <!-- Items Table with fixed column widths -->
+  <table class="w-full text-[11.5px]">
     <thead>
       <tr>
-        <th class="text-left">Item</th>
-        <th class="text-center">Qty</th>
-        <th class="text-right">Price</th>
+        <th class="col-item text-left">Item</th>
+        <th class="col-qty text-center">Qty</th>
+        <th class="col-price text-right">Price</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let data of order_items">
-        <td>{{ data.name }}</td>
-        <td class="text-center">{{ data.qty }}</td>
-        <td class="text-right">₹{{ data.price || 0 | number: "1.2-2" }}</td>
+        <td class="col-item text-left">{{ data.name }}</td>
+        <td class="col-qty text-center">{{ data.qty }}</td>
+        <td class="col-price text-right">₹{{ data.price || 0 | number: "1.2-2" }}</td>
       </tr>
     </tbody>
   </table>
 
-  <p class="text-[11px]">--------------------------------------------------</p>
+  <div class="divider-dashed"></div>
 
-  <!-- Totals -->
-  <div class="text-[12px]">
+  <!-- Totals Section -->
+  <div class="totals-block text-[11.5px]">
     <div
       *ngIf="order_detail.discountAmount && order_detail.discountAmount > 0"
-      class="flex justify-between mb-1"
+      class="flex justify-between mb-0.5"
     >
       <span>
         Discount
@@ -67,20 +66,20 @@
       <span>-₹{{ order_detail.discountAmount || 0 | number: "1.2-2" }}</span>
     </div>
 
-    <div *ngIf="order_detail.gstIncluded !== false" class="flex justify-between mb-1">
+    <div class="flex justify-between mb-0.5">
       <span>GST ({{ order_detail.gstRate || 5 }}%)</span>
       <span>₹{{ order_detail.gstAmount || 0 | number: "1.2-2" }}</span>
     </div>
 
-    <p class="flex justify-between font-bold text-[13px] mt-1">
+    <div class="flex justify-between font-bold text-[12.5px] mt-1">
       <span>Grand Total:</span>
       <span>₹{{ order_detail?.grandTotal || 0 | number: "1.2-2" }}</span>
-    </p>
+    </div>
   </div>
 
-  <p class="text-[11px]">--------------------------------------------------</p>
+  <div class="divider-dashed"></div>
 
-  <!-- ✅ Thank you message moved here -->
+  <!-- Thank you message -->
   <div class="text-center mt-2 text-[11px] leading-tight">
     <p>Thank you for your business!</p>
     <p>Please visit again!</p>
@@ -88,26 +87,29 @@
 </div>
 
 <!-- Kitchen Order Ticket -->
-<div id="kot" class="w-[300px] mx-auto text-black mt-4">
-  <h3 class="font-bold text-[13px]">KOT (Kitchen Order Ticket)</h3>
-  <p><b>Token:</b> {{ order_detail.tokenNumber }}</p>
-  <p><b>Date:</b> {{ order_detail.date | date: "dd/MM/yyyy" }}</p>
-  <table class="w-full text-[12px] mt-1">
+<div id="kot" class="receipt-paper w-[260px] mx-auto text-black mt-4">
+  <h3 class="font-bold text-[13px] text-center mb-1">KOT (Kitchen Order Ticket)</h3>
+  <div class="divider-dashed"></div>
+  <div class="text-[11px] text-left my-1">
+    <p><b>Token:</b> {{ order_detail.tokenNumber }}</p>
+    <p><b>Date:</b> {{ order_detail.date | date: "dd/MM/yyyy" }}</p>
+  </div>
+  <div class="divider-dashed"></div>
+  <table class="w-full text-[11.5px] mt-1">
     <thead>
       <tr>
-        <th class="text-left">Item</th>
-        <th class="text-center">Qty</th>
+        <th class="col-item text-left">Item</th>
+        <th class="col-qty text-center">Qty</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let data of order_items">
-        <td>{{ data.name }}</td>
-        <td class="text-center">{{ data.qty }}</td>
+        <td class="col-item text-left">{{ data.name }}</td>
+        <td class="col-qty text-center">{{ data.qty }}</td>
       </tr>
     </tbody>
   </table>
-
-  <p class="text-[11px]">--------------------------------------------------</p>
+  <div class="divider-dashed"></div>
 </div>
 
 <!-- Print Buttons -->
@@ -127,8 +129,36 @@
 
   <button
     (click)="printKOT()"
-    class="px-4 py-1 bg-black text-white rounded text-sm"
+    class="px-4 py-1 bg-black text-white rounded text-sm mr-2"
   >
     Print KOT
+  </button>
+
+  <!-- WhatsApp & Share Buttons -->
+  <button
+    (click)="sendOnWhatsApp()"
+    class="px-3 py-1 rounded text-sm font-semibold mr-2"
+    style="background:#25D366; color:white; border:none; cursor:pointer;"
+    title="Open in WhatsApp Web"
+  >
+    📲 WhatsApp Web
+  </button>
+
+  <button
+    (click)="openWhatsAppApp()"
+    class="px-3 py-1 rounded text-sm font-semibold mr-2"
+    style="background:#128C7E; color:white; border:none; cursor:pointer;"
+    title="Open in WhatsApp Desktop App (No loading)"
+  >
+    💬 WhatsApp App
+  </button>
+
+  <button
+    (click)="copyBillLink()"
+    class="px-3 py-1 rounded text-sm font-semibold"
+    style="background:#b45309; color:white; border:none; cursor:pointer;"
+    title="Copy link to paste into your open WhatsApp window"
+  >
+    📋 {{ copyButtonText }}
   </button>
 </div>

@@ -555,4 +555,51 @@ body {
 }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { 
+  margin: 0; 
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1E1711;
+}
+
+/* ===================================================
+   BELGIQUE BITES DESIGN SYSTEM (Cafe Warm Cream & Orange)
+   =================================================== */
+:root {
+  --bg-cream: #FAF7F0;
+  --bg-sidebar: #FFFDF7;
+  --bg-card: #FFFFFF;
+  --border-cream: #EFE7DA;
+  --border-card: #F0E6D8;
+  --primary-orange: #F97316;
+  --primary-orange-gradient: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%);
+  --orange-shadow: 0 4px 14px rgba(234, 88, 12, 0.3);
+  --text-primary: #1E1711;
+  --text-espresso: #2D1F12;
+  --text-muted: #786657;
+  --text-rust: #C2410C;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-heading: 'Bebas Neue', sans-serif;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.font-serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+.font-heading-bebas {
+  font-family: var(--font-heading);
+  letter-spacing: 0.5px;
+}
+
+.font-sans-outfit {
+  font-family: var(--font-sans);
+}
+
+.bg-graph-pattern {
+  background-color: #FAF7F0;
+  background-image: 
+    linear-gradient(#F0E8DC 1px, transparent 1px),
+    linear-gradient(90deg, #F0E8DC 1px, transparent 1px);
+  background-size: 32px 32px;
+}

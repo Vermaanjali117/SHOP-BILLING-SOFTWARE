@@ -1,85 +1,278 @@
-/* Layout Fixes */
 :host {
   display: block;
-  height: 100vh;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.input {
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  border-radius: 0.75rem;
-  border: 1px solid #d1d5db;
-  background: white;
-  transition: all 0.2s;
+.cart-page-container {
+  padding: 12px 24px 20px 24px;
 }
 
-.input:focus {
-  outline: none;
-  border-color: #a37e5c;
-  ring: 2px solid #a37e5c;
+/* Category & Title */
+.category-badge {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #9A7B56;
+  text-transform: uppercase;
+  margin-bottom: 0px;
+  display: block;
 }
 
-/* Quantity Controls */
-.qty-control {
-  background: #6b4e3d;
+.main-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.5px;
+  color: #1E1711;
+  line-height: 1.05;
+  margin: 1px 0 2px 0;
+}
+
+.subtitle {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #786657;
+  margin: 0;
+}
+
+/* Cafe Cards */
+.cafe-card {
+  background: #FFFFFF;
+  border: 1px solid #F0E6D8;
+  border-radius: 14px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 10px rgba(180, 140, 100, 0.04);
+}
+
+.card-heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  color: #C2410C;
+  margin: 0;
+}
+
+/* Order Item Row */
+.cart-item-row {
+  transition: background-color 0.15s ease;
+}
+
+.item-thumb {
+  width: 36px;
   height: 36px;
-}
-
-.qty-btn {
-  width: 32px;
-  height: 100%;
+  border-radius: 8px;
+  background: #FEEBC8;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 1.2rem;
-  transition: background 0.2s;
+  font-size: 17px;
+}
+
+.item-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: #1E1711;
+  margin: 0;
+}
+
+.item-unit-price {
+  font-size: 11px;
+  color: #786657;
+  font-weight: 500;
+  display: block;
+  margin-top: 1px;
+}
+
+.qty-pill {
+  border: 1px solid #E5D5C5;
+  border-radius: 9999px;
+  padding: 2px 6px;
+  background: #FFFFFF;
+}
+
+.qty-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: #352518;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
 }
 
 .qty-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  color: #C2410C;
 }
 
-/* Action Buttons */
-.btn-apply {
-  background: #059669;
-  color: white;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+.qty-count {
+  font-weight: 800;
+  font-size: 12px;
+  color: #1E1711;
+  min-width: 16px;
+  text-align: center;
 }
 
-.btn-cancel {
-  background: #dc2626;
-  color: white;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+.item-total-price {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: #C2410C;
+  letter-spacing: 0.5px;
 }
 
-.btn-create {
-  background: #6b4e3d;
-  color: white;
-  border-radius: 0.75rem;
+/* Special Offers */
+.offer-item-card {
+  border: 1px solid #E5D5C5;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #FFFFFF;
+}
+
+.offer-item-card:hover {
+  border-color: #F59E0B;
+  background: #FFFDF8;
+  transform: translateY(-1px);
+}
+
+.offer-item-card.active-offer {
+  border: 2px solid #EA580C;
+  background: #FFF9F2;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.15);
+}
+
+.offer-title {
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
+  font-size: 13px;
+  color: #1E1711;
+  margin: 0;
 }
 
-.btn-create:disabled {
-  background: #d1d5db;
+.offer-desc {
+  font-size: 11px;
+  color: #786657;
+  margin: 4px 0 0 0;
+  line-height: 1.25;
+}
+
+.offer-tag {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: #FEEBC8;
+  color: #8C5311;
+  letter-spacing: 0.5px;
+}
+
+/* Inputs */
+.cafe-input {
+  width: 100%;
+  border: 1px solid #E5D5C5;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  color: #1E1711;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #FFFFFF;
+  font-family: 'Outfit', sans-serif;
+  box-sizing: border-box;
+}
+
+.cafe-input:focus {
+  border-color: #F59E0B;
+}
+
+/* Bill Summary */
+.grand-total-val {
+  font-size: 30px;
+  color: #C2410C;
+  line-height: 1;
+  letter-spacing: 0.5px;
+}
+
+.pay-pill {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 9999px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  border: 1px solid #E5D5C5;
+  background: #FFFFFF;
+  color: #352518;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.pay-pill:hover {
+  background: #FDF3E5;
+  border-color: #D4A373;
+}
+
+.pay-pill.active-pay {
+  background: #F59E0B !important;
+  color: #1E1711 !important;
+  border-color: #F59E0B !important;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25) !important;
+}
+
+.create-invoice-btn {
+  width: 100%;
+  padding: 9px;
+  border-radius: 9999px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #F59E0B 0%, #EA580C 100%);
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+  transition: all 0.2s;
+}
+
+.create-invoice-btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.create-invoice-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
   box-shadow: none;
 }
 
-/* Scrollbar styling for better UX */
-::-webkit-scrollbar {
-  width: 6px;
+.apply-discount-btn {
+  width: 100%;
+  padding: 7px;
+  border-radius: 9999px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: #FFFFFF;
+  border: 1px solid #E5D5C5;
+  color: #352518;
+  cursor: pointer;
+  transition: all 0.2s;
 }
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 10px;
+
+.apply-discount-btn:hover {
+  background: #FDF3E5;
+  border-color: #D4A373;
+  color: #C2410C;
 }

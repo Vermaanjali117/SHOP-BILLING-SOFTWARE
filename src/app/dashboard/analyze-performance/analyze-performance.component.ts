@@ -3,11 +3,10 @@ import { DashboardService } from '../../../Shared/dashboard.service';
 import { SharedService } from '../../../Shared/shared.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LinechartComponent } from '../linechart/linechart.component';
-import { HeatmapchartComponent } from '../heatmapchart/heatmapchart.component';
 import { BarchartComponent } from '../barchart/barchart.component';
 import { DonutchartComponent } from '../donutchart/donutchart.component';
 import { AgGridModule } from 'ag-grid-angular';
+
 @Component({
   selector: 'app-analyze-performance',
   templateUrl: './analyze-performance.component.html',
@@ -15,39 +14,28 @@ import { AgGridModule } from 'ag-grid-angular';
   imports: [
     CommonModule,
     FormsModule,
-    LinechartComponent,
+    BarchartComponent,
+    DonutchartComponent,
     AgGridModule,
-    // HeatmapchartComponent,
-    // BarchartComponent,
-    // DonutchartComponent,
   ],
   styleUrls: ['./analyze-performance.component.css'],
 })
 export class AnalyzePerformanceComponent implements OnInit {
-  selectedRange = '7days';
-  totalRevenue: any;
-  totalOrders: any;
-  columnDefs: any;
-  gridApi: any;
-  gridColumnApi: any;
-  totalConsumption: any = [];
-  consumptionList: any = [];
+  selectedPeriod: 'today' | '7days' | '30days' = '7days';
+  totalRevenue: number = 0;
+  totalOrders: number = 0;
+  totalConsumption: number = 0;
+  consumptionList: any[] = [];
   fromDate?: string;
   toDate?: string;
-  rowData: any = [];
-  granularity = 'day';
   salesSummary: any = [];
-  revenueSeries: any = [];
-  summary: any = {
-    revenue: 0,
-    transactions: 0,
-    aov: 0,
-    itemsSold: 0,
-    discountGiven: 0,
-    discountPct: 0,
-    periodLabel: 'Last 7 days',
-    peakHourLabel: null,
-    peakHourCount: 0,
+  revenueSeries: Array<{ label: string; value: number }> = [];
+  paymentSeries: Array<{ name: string; value: number }> = [];
+  paymentStats = {
+    cash: 0,
+    upi: 0,
+    card: 0,
+    total: 0,
   };
 
   constructor(
@@ -55,13 +43,36 @@ export class AnalyzePerformanceComponent implements OnInit {
     private sharedSvc: SharedService,
   ) {}
 
-  ngOnInit(): void {
-    const range = this.getLast7Days();
+  getPaymentPct(mode: 'Cash' | 'UPI' | 'Card'): number {
+    const total = this.paymentStats.total || (this.paymentStats.cash + this.paymentStats.upi + this.paymentStats.card);
+    if (!total || total === 0) return 0;
+    const val = mode === 'Cash' ? this.paymentStats.cash : mode === 'UPI' ? this.paymentStats.upi : this.paymentStats.card;
+    return Math.round((val / total) * 100);
+  }
 
-    this.fromDate = range.from;
-    this.toDate = range.to;
+  ngOnInit(): void {
+    this.setPeriod('7days');
+  }
+
+  setPeriod(period: 'today' | '7days' | '30days') {
+    this.selectedPeriod = period;
+    const now = new Date();
+    const toStr = now.toISOString().split('T')[0];
+    let fromDateObj = new Date();
+
+    if (period === 'today') {
+      fromDateObj = now;
+    } else if (period === '7days') {
+      fromDateObj.setDate(now.getDate() - 6);
+    } else if (period === '30days') {
+      fromDateObj.setDate(now.getDate() - 29);
+    }
+
+    this.fromDate = fromDateObj.toISOString().split('T')[0];
+    this.toDate = toStr;
     this.loadDashboardData(this.fromDate, this.toDate);
   }
+
   loadDashboardData(from?: string, to?: string) {
     this.loadRevenueCard(from, to);
     this.loadConsumptionCard(from, to);
@@ -70,133 +81,105 @@ export class AnalyzePerformanceComponent implements OnInit {
   loadRevenueCard(from?: string, to?: string) {
     this.sharedSvc.getsalessummery(from, to).subscribe((res: any) => {
       const sales = res.sales || [];
-
       this.salesSummary = sales;
-      this.revenueSeries = this.salesSummary.map(
-        (s: { _id: any; totalSales: any }) => ({
-          label: s._id, // date
-          value: s.totalSales, // revenue
-        }),
-      );
+
       this.totalRevenue = sales.reduce(
-        (sum: number, s: any) => sum + s.totalSales,
+        (sum: number, s: any) => sum + (s.totalSales || 0),
         0,
       );
 
       this.totalOrders = sales.reduce(
-        (sum: number, s: any) => sum + s.orderCount,
+        (sum: number, s: any) => sum + (s.orderCount || 0),
         0,
       );
 
-      console.log('Revenue:', this.totalRevenue);
-      console.log('Orders:', this.totalOrders);
+      // Build daily sequence for the bar chart
+      this.revenueSeries = this.buildDailySequence(from, to, sales);
+
+      // Process payment mode breakdown (Cash, Card, UPI)
+      const breakdown = res.paymentBreakdown || [];
+      const paymentMap: Record<string, number> = {
+        Cash: 0,
+        UPI: 0,
+        Card: 0,
+      };
+
+      breakdown.forEach((item: any) => {
+        const mode = item._id || 'Other';
+        if (mode === 'Cash' || mode === 'UPI' || mode === 'Card') {
+          paymentMap[mode] = item.totalAmount || 0;
+        } else {
+          paymentMap[mode] = (paymentMap[mode] || 0) + (item.totalAmount || 0);
+        }
+      });
+
+      this.paymentStats = {
+        cash: paymentMap['Cash'] || 0,
+        upi: paymentMap['UPI'] || 0,
+        card: paymentMap['Card'] || 0,
+        total: (paymentMap['Cash'] || 0) + (paymentMap['UPI'] || 0) + (paymentMap['Card'] || 0),
+      };
+
+      this.paymentSeries = [
+        { name: 'Cash', value: this.paymentStats.cash },
+        { name: 'UPI', value: this.paymentStats.upi },
+        { name: 'Card', value: this.paymentStats.card },
+      ];
     });
+  }
+
+  private buildDailySequence(
+    from?: string,
+    to?: string,
+    sales: any[] = [],
+  ): Array<{ label: string; value: number }> {
+    if (!from || !to) {
+      return sales.map((s) => ({
+        label: String(s._id || '').slice(-2),
+        value: s.totalSales || 0,
+      }));
+    }
+
+    const start = new Date(from);
+    const end = new Date(to);
+    const days: Array<{ label: string; value: number }> = [];
+
+    const salesMap = new Map<string, number>();
+    sales.forEach((s) => {
+      salesMap.set(String(s._id), s.totalSales || 0);
+    });
+
+    const curr = new Date(start);
+    while (curr <= end) {
+      const dateStr = curr.toISOString().split('T')[0];
+      const dayNum = String(curr.getDate());
+      days.push({
+        label: dayNum,
+        value: salesMap.get(dateStr) || 0,
+      });
+      curr.setDate(curr.getDate() + 1);
+    }
+
+    return days;
   }
 
   loadConsumptionCard(from?: string, to?: string) {
     this.sharedSvc.getConsumptionSummary(from, to).subscribe((res: any) => {
       const list = res.summary || [];
-
-      this.consumptionList = list;
-      this.getaddedittable();
       this.totalConsumption = list.reduce(
-        (sum: number, m: any) => sum + m.totalUsed,
+        (sum: number, m: any) => sum + (m.totalUsed || 0),
         0,
       );
+
+      // Compute share percentage for each material
+      this.consumptionList = list.map((item: any) => ({
+        name: item.name,
+        totalUsed: item.totalUsed,
+        unit: item.unit || 'gm',
+        sharePct: this.totalConsumption > 0
+          ? Math.round((item.totalUsed / this.totalConsumption) * 100)
+          : 0,
+      }));
     });
-  }
-
-  loadRevenueSeries() {
-    this.svc
-      .getRevenueSeries(this.fromDate, this.toDate, this.granularity)
-      .subscribe((s) => (this.revenueSeries = s));
-  }
-  getToday(): string {
-    return new Date().toISOString().split('T')[0];
-  }
-
-  getLast7Days(): { from: string; to: string } {
-    const to = new Date();
-    const from = new Date();
-    from.setDate(to.getDate() - 6); // last 7 days incl today
-
-    return {
-      from: from.toISOString().split('T')[0],
-      to: to.toISOString().split('T')[0],
-    };
-  }
-  applyDateFilter() {
-    alert('ghgh');
-    console.log('from', this.fromDate);
-    console.log('to', this.toDate);
-    if (!this.fromDate || !this.toDate) return;
-
-    this.loadDashboardData(this.fromDate, this.toDate);
-  }
-
-  resetToLast7Days() {
-    const range = this.getLast7Days();
-    this.fromDate = range.from;
-    this.toDate = range.to;
-
-    this.loadDashboardData(this.fromDate, this.toDate);
-  }
-  onGridReady(params: any) {
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-  }
-
-  getaddedittable() {
-    this.columnDefs = [
-      {
-        headerName: 'S.No',
-        valueGetter: 'node.rowIndex + 1',
-        width: 80,
-      },
-      {
-        headerName: 'Raw Material',
-        field: 'name',
-        flex: 2,
-        sortable: true,
-        filter: true,
-      },
-      {
-        headerName: 'Total Used',
-        field: 'totalUsed',
-        flex: 1,
-        sortable: true,
-        filter: 'agNumberColumnFilter',
-      },
-      {
-        headerName: 'Unit',
-        field: 'unit',
-        width: 100,
-      },
-      {
-        headerName: 'Usage Count',
-        field: 'usageCount',
-        flex: 1,
-        sortable: true,
-        filter: 'agNumberColumnFilter',
-      },
-    ];
-
-    this.rowData = this.consumptionList;
-  }
-
-  exportCsv() {
-    this.svc.exportCsv().subscribe((blob) => {
-      /* trigger download */
-    });
-  }
-
-  openOrder(o: any) {
-    /* modal */
-  }
-  editOrder(o: any) {
-    /* reuse edit flow: set cart service, localStorage, navigate to cart */
-  }
-  loadMoreOrders() {
-    /* pagination */
   }
 }

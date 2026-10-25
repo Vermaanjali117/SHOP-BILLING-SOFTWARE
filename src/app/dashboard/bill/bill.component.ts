@@ -37,6 +37,7 @@ export class BillComponent implements OnInit {
     },
   };
   orderId: string | null = null;
+  whatsappLink: string = '';
   adminid: any;
   order_detail: any = {
     orderNumber: '',
@@ -71,7 +72,11 @@ export class BillComponent implements OnInit {
   ngOnInit(): void {
     this.branchId = localStorage.getItem('admin');
     this.currentBranch =
-      this.branches[this.branchId] || this.branches['BRANCH_ID_1'];
+      (this.branchId && this.branches[this.branchId]) || {
+        name: 'THE BELGIQUE BITES CO',
+        subtitle: 'Waffles & More',
+        address: 'Kanpur',
+      };
     console.log('this.adminid ', this.branchId);
     // get order id from route (adjust param name if different)
     this.orderId =
@@ -81,10 +86,32 @@ export class BillComponent implements OnInit {
     if (this.orderId) {
       this.loadOrder(this.orderId);
     } else {
-      // if order is passed some other way, handle it here
       console.warn('No order id in route');
     }
   }
+
+  getPublicBillUrl(): string {
+    const origin = window.location.origin;
+    const isLocal = origin.includes('localhost') || origin.includes('127.0.0.1');
+    const liveDomain = 'https://thebelgiquebites.co.in';
+    const baseDomain = isLocal ? liveDomain : origin;
+    return `${baseDomain}/public-bill/${this.orderId}`;
+  }
+
+  buildWhatsAppLink(phone: string) {
+    if (!phone) return;
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone.length < 10) return;
+    const withCountryCode = `91${cleanPhone.slice(-10)}`;
+    const billUrl = this.getPublicBillUrl();
+    const msg = encodeURIComponent(
+      `Hello! Here is your bill from The Belgique Bites Co 🧇\n${billUrl}`
+    );
+    // Use web.whatsapp.com/send so it opens directly in WhatsApp Web (no redirect page)
+    this.whatsappLink = `https://web.whatsapp.com/send?phone=${withCountryCode}&text=${msg}`;
+  }
+
+
 
   loadOrder(id: string) {
     this.sharedservice.getOrderById(id).subscribe({
@@ -95,9 +122,17 @@ export class BillComponent implements OnInit {
         this.order_detail = order;
         this.order_items = Array.isArray(order.items) ? order.items : [];
 
+        if (order.branchId && this.branches[order.branchId]) {
+          this.currentBranch = this.branches[order.branchId];
+        }
+
+        // Build WhatsApp link now that we have the phone number
+        if (order.phone) {
+          this.buildWhatsAppLink(order.phone);
+        }
+
         const discountAmount = Number(order.discountAmount || 0);
         const discountValue = Number(order.discountValue || 0);
-        const gstIncluded = order.gstIncluded !== false;
         const gstRate = Number(order.gstRate || 5);
 
         const calculatedSubTotal = this.order_items.reduce(
@@ -106,14 +141,16 @@ export class BillComponent implements OnInit {
         );
 
         const discountedSubtotal = Math.max(0, calculatedSubTotal - discountAmount);
-        const gstAmount = gstIncluded ? +((discountedSubtotal * gstRate) / 100).toFixed(2) : 0;
-        const calculatedGrandTotal = +(discountedSubtotal + gstAmount).toFixed(2);
+        // Inclusive GST (5%) - does not exceed menu price
+        const taxableBase = +(discountedSubtotal / (1 + gstRate / 100)).toFixed(2);
+        const gstAmount = +(discountedSubtotal - taxableBase).toFixed(2);
+        const calculatedGrandTotal = +discountedSubtotal.toFixed(2);
 
         this.order_detail.grossTotal = calculatedSubTotal;
         this.order_detail.subTotal = calculatedSubTotal;
         this.order_detail.discountAmount = discountAmount;
         this.order_detail.discountValue = discountValue;
-        this.order_detail.gstIncluded = gstIncluded;
+        this.order_detail.gstIncluded = true;
         this.order_detail.gstRate = gstRate;
         this.order_detail.gstAmount = gstAmount;
         this.order_detail.grandTotal = calculatedGrandTotal;
@@ -157,46 +194,108 @@ export class BillComponent implements OnInit {
       <head>
         <title>Invoice</title>
         <style>
-          /* Reset margins for printing */
-          @page { margin: 0; }
-          body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            color: #000; 
-            margin: 10px;
-            padding: 0;
+          /* Safe margins so thermal printer doesn't cut left/right text */
+          @page { 
+            size: auto; 
+            margin: 0mm 4mm; 
           }
-          .w-[300px] { width: 280px; margin: 0 auto; }
+          * {
+            box-sizing: border-box;
+          }
+          body { 
+            font-family: Arial, 'Segoe UI', Tahoma, sans-serif; 
+            color: #000; 
+            margin: 0;
+            padding: 2px 8px; /* Safe padding from thermal paper edge */
+            width: 100%;
+          }
+          img { display: none !important; }
+          .receipt-paper,
+          .w-\\[260px\\],
+          .w-\\[300px\\] { 
+            width: 250px; 
+            max-width: 100%;
+            margin: 0 auto; 
+            padding: 0 4px;
+            box-sizing: border-box;
+          }
           
-          /* Heading Fix: Force single line and smaller font */
+          /* Heading */
           h4 { 
-            font-size: 16px; 
+            font-size: 15px; 
             margin: 0 0 2px 0; 
-            white-space: nowrap; 
             font-weight: 800;
             text-transform: uppercase;
+            text-align: center;
           }
           
-          /* Tighten spacing */
           p { margin: 1px 0; line-height: 1.2; }
           .text-center { text-align: center; }
-          .text-[10px] { font-size: 10px; }
-          .text-[11px] { font-size: 11px; }
-          .text-[12px] { font-size: 11px; } /* Slightly smaller for better fit */
+          .text-left { text-align: left; }
+          .text-right { text-align: right; }
+          .text-\\[10px\\] { font-size: 10px; }
+          .text-\\[11px\\] { font-size: 11px; }
+          .text-\\[11\\.5px\\] { font-size: 11.5px; }
+          .text-\\[12px\\] { font-size: 11.5px; }
+          .text-\\[12\\.5px\\] { font-size: 12px; }
+          .text-\\[13px\\] { font-size: 12px; }
+          .text-\\[16px\\] { font-size: 15px; }
+          .text-\\[18px\\] { font-size: 15px; }
+          
+          /* Middle Info - strictly left-aligned as shown in bill */
+          .invoice-info {
+            text-align: left !important;
+            margin: 4px 0;
+          }
+          .invoice-info div {
+            text-align: left !important;
+            margin: 1px 0;
+            line-height: 1.25;
+          }
           
           /* Table styling */
-          table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-          th { border-bottom: 1px dashed #000; text-align: left; font-size: 11px; }
-          td { padding: 3px 0; vertical-align: top; }
-          .text-right { text-align: right; }
-          .text-center { text-align: center; }
+          table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 3px 0; 
+            table-layout: fixed;
+          }
+          th { 
+            border-bottom: 1px dashed #000; 
+            font-size: 11px; 
+            padding: 2px 0;
+          }
+          td { 
+            padding: 2px 0; 
+            vertical-align: top; 
+            font-size: 11.5px;
+          }
+          .col-item { width: 55%; text-align: left; word-break: break-word; }
+          .col-qty  { width: 15%; text-align: center; }
+          .col-price{ width: 30%; text-align: right; }
+          
+          /* Dashed divider line */
+          .divider-dashed {
+            border-top: 1px dashed #000;
+            margin: 4px 0;
+            width: 100%;
+          }
           
           /* Totals Section */
+          .totals-block {
+            margin: 3px 0;
+          }
+          .flex { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 1px 0;
+          }
           .font-bold { font-weight: bold; }
-          .flex { display: flex; justify-content: space-between; }
+          .font-semibold { font-weight: 600; }
         </style>
       </head>
       <body>
-        <div class="w-[300px]">
+        <div class="receipt-paper">
           ${content}
         </div>
       </body>
@@ -228,16 +327,25 @@ export class BillComponent implements OnInit {
         <head>
           <title>KOT</title>
           <style>
-            body { font-family: Arial, sans-serif; color: #000; }
-            .w-[300px]{ width: 300px; margin: 0 auto; }
+            @page { size: auto; margin: 0mm 4mm; }
+            * { box-sizing: border-box; }
+            body { font-family: Arial, sans-serif; color: #000; margin: 0; padding: 2px 8px; }
+            .receipt-paper,
+            .w-\\[260px\\],
+            .w-\\[300px\\]{ width: 250px; max-width: 100%; margin: 0 auto; padding: 0 4px; box-sizing: border-box; }
             .text-center { text-align: center; }
-            .text-[12px] { font-size: 12px; }
-            table { width: 100%; border-collapse: collapse; font-size: 12px; }
-            td, th { padding: 4px 0; }
+            .text-left { text-align: left; }
+            .text-right { text-align: right; }
+            table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin: 3px 0; table-layout: fixed; }
+            th { border-bottom: 1px dashed #000; padding: 2px 0; font-size: 11px; }
+            td { padding: 2px 0; }
+            .col-item { width: 75%; text-align: left; word-break: break-word; }
+            .col-qty  { width: 25%; text-align: center; }
+            .divider-dashed { border-top: 1px dashed #000; margin: 4px 0; width: 100%; }
           </style>
         </head>
         <body>
-          <div class="w-[300px]">
+          <div class="receipt-paper">
             ${content}
           </div>
         </body>
@@ -249,6 +357,44 @@ export class BillComponent implements OnInit {
       win.print();
       win.close();
     }, 300);
+  }
+
+  copyButtonText: string = 'Copy Link';
+
+  sendOnWhatsApp() {
+    if (this.whatsappLink) {
+      window.open(this.whatsappLink, 'whatsapp_tab');
+    }
+  }
+
+  openWhatsAppApp() {
+    const phone = this.order_detail?.phone || '';
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) {
+      alert('No valid customer phone number found on this bill.');
+      return;
+    }
+    const withCountryCode = `91${cleanPhone.slice(-10)}`;
+    const billUrl = this.getPublicBillUrl();
+    const msg = encodeURIComponent(
+      `Hello! Here is your bill from The Belgique Bites Co 🧇\n${billUrl}`
+    );
+    // Directly opens WhatsApp Desktop on Windows without any web loading!
+    window.location.href = `whatsapp://send?phone=${withCountryCode}&text=${msg}`;
+  }
+
+  copyBillLink() {
+    const billUrl = this.getPublicBillUrl();
+    const msg = `Hello! Here is your bill from The Belgique Bites Co 🧇\n${billUrl}`;
+    navigator.clipboard.writeText(msg).then(() => {
+      this.copyButtonText = '✓ Copied!';
+      setTimeout(() => {
+        this.copyButtonText = 'Copy Link';
+      }, 2500);
+    }).catch(() => {
+      // Fallback
+      prompt('Copy bill link:', msg);
+    });
   }
 
   // optional: go back

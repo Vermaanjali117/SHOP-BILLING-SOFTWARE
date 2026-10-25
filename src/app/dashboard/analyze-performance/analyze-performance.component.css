@@ -1,206 +1,203 @@
 :host {
-  --primary-orange: #ffb347;
-  --primary-blue: #6c8cff;
-  --primary-red: #ff7a7a;
-  --bg-color: #f8f9fa;
-  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-  font-family: "Inter", sans-serif;
+  display: block;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.dashboard-container {
-  padding: 12px;
-  background-color: var(--bg-color);
-  min-height: 100vh;
+.analyze-page-container {
+  padding: 12px 24px 20px 24px;
 }
 
-/* HEADER & FILTERS */
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.header-text h1 {
-  margin: 0;
-  font-size: 24px;
-  color: #1a1a1a;
-  font-weight: 700;
-}
-
-.header-text p {
-  margin: 4px 0 0;
-  color: #666;
-}
-
-.filter-controls {
-  display: flex;
-  gap: 16px;
-  background: white;
-  padding: 10px;
-  border-radius: 12px;
-  box-shadow: var(--card-shadow);
-  align-items: flex-end;
-}
-
-.date-group {
-  display: flex;
-  gap: 12px;
-}
-
-.input-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.input-wrapper label {
-  font-size: 11px;
+/* Category & Title */
+.category-badge {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #9A7B56;
   text-transform: uppercase;
-  color: #999;
-  font-weight: 600;
+  margin-bottom: 1px;
+  display: block;
 }
 
-.input-wrapper input {
-  border: 1px solid #e0e0e0;
-  padding: 3px;
-  border-radius: 6px;
-  font-size: 14px;
+.main-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  letter-spacing: 0.5px;
+  color: #1E1711;
+  line-height: 1;
+  margin: 1px 0 2px 0;
 }
 
-.button-group {
-  display: flex;
-  gap: 8px;
+.subtitle {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #786657;
+  margin: 0;
 }
 
-.btn {
-  padding: 3px 18px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
+/* Filter Pills */
+.filter-pill {
+  padding: 4px 14px;
+  border-radius: 9999px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: #FFFFFF;
+  border: 1px solid #E5D5C5;
+  color: #352518;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s ease;
 }
 
-.btn-apply {
-  background: #1a1a1a;
-  color: white;
-}
-.btn-apply:hover {
-  background: #333;
-}
-.btn-secondary {
-  background: #f0f0f0;
-  color: #444;
+.filter-pill:hover {
+  background: #FDF3E5;
+  border-color: #D4A373;
 }
 
-/* KPI CARDS */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  margin-bottom: 12px;
+.filter-pill.active-pill {
+  background: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3) !important;
 }
 
-.kpi-card {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
+/* 3 KPI Cards */
+.cafe-kpi-card {
+  background: #FFFFFF;
+  border: 1px solid #F0E6D8;
+  border-radius: 12px;
+  padding: 9px 16px;
   display: flex;
   align-items: center;
-  gap: 20px;
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(0, 0, 0, 0.02);
+  gap: 12px;
+  box-shadow: 0 2px 10px rgba(180, 140, 100, 0.04);
 }
 
-.kpi-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
+.kpi-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #FEEBC8;
+  color: #8C5311;
+  font-family: 'Outfit', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-}
-
-.revenue-card .kpi-icon {
-  background: #fff4e5;
-  color: var(--primary-orange);
-}
-.transactions-card .kpi-icon {
-  background: #eef2ff;
-  color: var(--primary-blue);
-}
-.consumption-card .kpi-icon {
-  background: #fff0f0;
-  color: var(--primary-red);
-}
-
-.revenue-card {
-  border-top: 4px solid var(--primary-orange);
-}
-.transactions-card {
-  border-top: 4px solid var(--primary-blue);
-}
-.consumption-card {
-  border-top: 4px solid var(--primary-red);
+  flex-shrink: 0;
 }
 
 .kpi-label {
-  color: #888;
-  font-size: 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #8C7A6B;
+  text-transform: uppercase;
+  display: block;
 }
-.kpi-value {
-  margin: 4px 0;
+
+.kpi-num {
+  font-family: 'Bebas Neue', sans-serif;
   font-size: 28px;
-  font-weight: 700;
-}
-.kpi-sub {
-  font-size: 12px;
-  color: #aaa;
-}
-
-/* SECTIONS */
-.chart-section,
-.table-section {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: var(--card-shadow);
-  margin-bottom: 18px;
+  color: #1E1711;
+  line-height: 1;
+  margin-top: 1px;
+  letter-spacing: 0.5px;
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+/* Chart Cards */
+.chart-card {
+  background: #FFFFFF;
+  border: 1px solid #F0E6D8;
+  border-radius: 14px;
+  padding: 12px 18px 10px 18px;
+  box-shadow: 0 2px 10px rgba(180, 140, 100, 0.04);
 }
 
-.section-header h3 {
+.card-heading-box {
+  border-bottom: 1px solid #EFE7DA;
+  padding-bottom: 5px;
+  margin-bottom: 8px;
+}
+
+.card-heading-box.no-border {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.card-heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  color: #C2410C;
   margin: 0;
-  font-size: 18px;
-  color: #333;
 }
 
-/* CHART FIX */
-.chart-container {
-  height: 300px;
+.chart-wrap {
+  height: 250px;
   width: 100%;
 }
 
-/* AG-GRID CUSTOMIZATION */
-.grid-wrapper {
-  border-radius: 8px;
-  overflow: hidden;
+.chart-wrap-pie {
+  height: 250px;
+  width: 100%;
 }
 
-.ag-theme-alpine {
-  --ag-header-background-color: #fcfcfc;
-  --ag-border-color: #f0f0f0;
+.pay-stat-pill-bottom {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.paddingcustom{
-    padding-bottom:23px !important;
+
+.pay-stat-pill-bottom:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(180, 140, 100, 0.08);
+}
+
+/* Raw Materials Table Card */
+.raw-materials-card {
+  background: #FFFFFF;
+  border: 1px solid #F0E6D8;
+  border-radius: 14px;
+  padding: 12px 18px;
+  box-shadow: 0 2px 10px rgba(180, 140, 100, 0.04);
+}
+
+.materials-table-wrap {
+  border: 1px solid #F0E6D8;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #FFFFFF;
+}
+
+.table-head-row {
+  background: #FBF4E8;
+  padding: 6px 14px;
+}
+
+.table-th {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #8C7A6B;
+  text-transform: uppercase;
+}
+
+.share-progress-track {
+  height: 6px;
+  background: #FEEBC8;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.share-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #F59E0B 0%, #EA580C 100%);
+  transition: width 0.3s ease;
 }
