@@ -83,12 +83,19 @@ export class BillComponent implements OnInit {
       this.route.snapshot.paramMap.get('id') ||
       this.route.snapshot.paramMap.get('orderId');
 
+    const savedLinkOnly = localStorage.getItem('whatsapp_link_only');
+    if (savedLinkOnly !== null) {
+      this.sendLinkOnly = savedLinkOnly === 'true';
+    }
+
     if (this.orderId) {
       this.loadOrder(this.orderId);
     } else {
       console.warn('No order id in route');
     }
   }
+
+  sendLinkOnly: boolean = true; // Defaults to sending only the clean link
 
   getPublicBillUrl(): string {
     const origin = window.location.origin;
@@ -98,15 +105,28 @@ export class BillComponent implements OnInit {
     return `${baseDomain}/public-bill/${this.orderId}`;
   }
 
+  getWhatsAppMessage(): string {
+    const billUrl = this.getPublicBillUrl();
+    if (this.sendLinkOnly) {
+      return billUrl;
+    }
+    return `Hello! Here is your bill from The Belgique Bites Co 🧇\n${billUrl}`;
+  }
+
+  toggleSendLinkOnly(): void {
+    this.sendLinkOnly = !this.sendLinkOnly;
+    localStorage.setItem('whatsapp_link_only', String(this.sendLinkOnly));
+    if (this.order_detail?.phone) {
+      this.buildWhatsAppLink(this.order_detail.phone);
+    }
+  }
+
   buildWhatsAppLink(phone: string) {
     if (!phone) return;
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone.length < 10) return;
     const withCountryCode = `91${cleanPhone.slice(-10)}`;
-    const billUrl = this.getPublicBillUrl();
-    const msg = encodeURIComponent(
-      `Hello! Here is your bill from The Belgique Bites Co 🧇\n${billUrl}`
-    );
+    const msg = encodeURIComponent(this.getWhatsAppMessage());
     // Use web.whatsapp.com/send so it opens directly in WhatsApp Web (no redirect page)
     this.whatsappLink = `https://web.whatsapp.com/send?phone=${withCountryCode}&text=${msg}`;
   }
@@ -375,17 +395,13 @@ export class BillComponent implements OnInit {
       return;
     }
     const withCountryCode = `91${cleanPhone.slice(-10)}`;
-    const billUrl = this.getPublicBillUrl();
-    const msg = encodeURIComponent(
-      `Hello! Here is your bill from The Belgique Bites Co 🧇\n${billUrl}`
-    );
+    const msg = encodeURIComponent(this.getWhatsAppMessage());
     // Directly opens WhatsApp Desktop on Windows without any web loading!
     window.location.href = `whatsapp://send?phone=${withCountryCode}&text=${msg}`;
   }
 
   copyBillLink() {
-    const billUrl = this.getPublicBillUrl();
-    const msg = `Hello! Here is your bill from The Belgique Bites Co 🧇\n${billUrl}`;
+    const msg = this.getWhatsAppMessage();
     navigator.clipboard.writeText(msg).then(() => {
       this.copyButtonText = '✓ Copied!';
       setTimeout(() => {

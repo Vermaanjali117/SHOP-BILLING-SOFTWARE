@@ -155,10 +155,20 @@
 
   <button
     (click)="copyBillLink()"
-    class="px-3 py-1 rounded text-sm font-semibold"
+    class="px-3 py-1 rounded text-sm font-semibold mr-3"
     style="background:#b45309; color:white; border:none; cursor:pointer;"
     title="Copy link to paste into your open WhatsApp window"
   >
     📋 {{ copyButtonText }}
   </button>
+
+  <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-[#4A3A28] select-none align-middle ml-1">
+    <input
+      type="checkbox"
+      [checked]="sendLinkOnly"
+      (change)="toggleSendLinkOnly()"
+      class="cursor-pointer"
+    />
+    <span>Send link only</span>
+  </label>
 </div>
