@@ -94,6 +94,12 @@ export class SharedService {
       withCredentials: true,
     });
   }
+
+  updateOrder(id: string, sync: any) {
+    return this.http.patch(`${this.apiUrl}/orders/updateorder/${id}`, sync, {
+      withCredentials: true,
+    });
+  }
   deleteRawMaterial(id: string) {
     return this.http.delete(`${this.apiUrl}/raw-materials/delete/${id}`, {
       withCredentials: true,
@@ -193,5 +199,62 @@ export class SharedService {
       `${this.apiUrl}/raw-materials/batch-preview/${premixId}`,
       { withCredentials: true },
     );
+  }
+
+  // ---- Expense Tracking APIs ----
+  addExpense(data: any) {
+    return this.http.post(`${this.apiUrl}/expenses/add`, data, {
+      withCredentials: true,
+    });
+  }
+
+  getExpenses(from?: string, to?: string, category?: string, search?: string) {
+    let params: any = {};
+    if (from && to) {
+      params.from = from;
+      params.to = to;
+    } else if (from) {
+      params.from = from;
+    } else if (to) {
+      params.to = to;
+    }
+    if (category && category !== 'All') {
+      params.category = category;
+    }
+    if (search && search.trim()) {
+      params.search = search.trim();
+    }
+    return this.http.get(`${this.apiUrl}/expenses/list`, {
+      params,
+      withCredentials: true,
+    });
+  }
+
+  updateExpense(id: string, data: any) {
+    return this.http.put(`${this.apiUrl}/expenses/update/${id}`, data, {
+      withCredentials: true,
+    });
+  }
+
+  deleteExpense(id: string) {
+    return this.http.delete(`${this.apiUrl}/expenses/delete/${id}`, {
+      withCredentials: true,
+    });
+  }
+
+  getExpenseSummary(from?: string, to?: string) {
+    let params: any = {};
+    if (from && to) {
+      params.from = from;
+      params.to = to;
+    } else if (from) {
+      params.from = from;
+    } else if (to) {
+      params.to = to;
+    }
+    return this.http.get(`${this.apiUrl}/expenses/summary`, {
+      params,
+      withCredentials: true,
+    });
   }
 }

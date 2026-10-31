@@ -14,6 +14,7 @@ import { RowMaterialComponent } from './row-material/row-material.component';
 import { AnalyzePerformanceComponent } from './analyze-performance/analyze-performance.component';
 import { InventoryHistoryComponent } from './inventory-history/inventory-history.component';
 import { ManageOffersComponent } from './manage-offers/manage-offers.component';
+import { TrackExpensesComponent } from './track-expenses/track-expenses.component';
 
 const routes: Routes = [
   {
@@ -28,10 +29,10 @@ const routes: Routes = [
       { path: 'invoice_list', component: CustomerComponent },
       { path: 'sales_summary', component: SalessummeryComponent },
       { path: 'analyze-performance', component: AnalyzePerformanceComponent },
+      { path: 'track-expenses', component: TrackExpensesComponent },
       { path: 'row-material-management', component: RowMaterialComponent },
       { path: 'inventory-history', component: InventoryHistoryComponent },
       { path: 'manage_offers', component: ManageOffersComponent },
-      { path: 'add_recipe', component: AddRecipeComponent },
     ],
   },
 ];

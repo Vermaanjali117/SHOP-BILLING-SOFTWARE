@@ -7,8 +7,8 @@
       <p class="subtitle font-serif-italic">Revenue, orders and materials used at a glance.</p>
     </div>
 
-    <!-- Quick Date Filter Pills -->
-    <div class="period-filter-pills flex items-center gap-2">
+    <!-- Quick Date Filter Pills & Custom Date Range -->
+    <div class="period-filter-pills flex items-center flex-wrap gap-2">
       <button
         class="filter-pill"
         [class.active-pill]="selectedPeriod === 'today'"
@@ -30,6 +30,42 @@
       >
         30 DAYS
       </button>
+
+      <!-- Custom Date Inputs with Click-to-Open Calendar -->
+      <div class="custom-date-box flex items-center gap-1.5 bg-white border border-[#E5D5C5] rounded-full px-3 py-1 text-xs shadow-2xs">
+        <span class="text-[10px] font-bold text-[#8C7A6B] uppercase cursor-pointer" (click)="openPickerByRef(fromInput)">From</span>
+        <input
+          #fromInput
+          type="date"
+          [(ngModel)]="customFrom"
+          (click)="openDatePicker($event)"
+          class="text-xs text-[#1E1711] bg-transparent focus:outline-none cursor-pointer font-medium"
+        />
+        <span class="text-[10px] font-bold text-[#8C7A6B] uppercase cursor-pointer" (click)="openPickerByRef(toInput)">To</span>
+        <input
+          #toInput
+          type="date"
+          [(ngModel)]="customTo"
+          (click)="openDatePicker($event)"
+          class="text-xs text-[#1E1711] bg-transparent focus:outline-none cursor-pointer font-medium"
+        />
+        <button
+          type="button"
+          (click)="applyCustomDate()"
+          [disabled]="!customFrom || !customTo"
+          class="apply-btn px-2.5 py-0.5 text-xs font-bold text-white bg-[#EA580C] hover:bg-[#C2410C] rounded-full transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-2xs"
+        >
+          Apply
+        </button>
+        <button
+          *ngIf="selectedPeriod === 'custom'"
+          type="button"
+          (click)="resetFilter()"
+          class="reset-btn text-[11px] font-bold text-[#EA580C] hover:underline cursor-pointer ml-1"
+        >
+          Reset
+        </button>
+      </div>
     </div>
   </header>
 
@@ -69,7 +105,7 @@
     <div class="chart-card lg:col-span-6">
       <div class="card-heading-box">
         <h3 class="card-heading font-heading-bebas">
-          REVENUE, {{ selectedPeriod === 'today' ? 'TODAY' : selectedPeriod === '30days' ? 'LAST 30 DAYS' : 'LAST 7 DAYS' }}
+          REVENUE, {{ selectedPeriod === 'today' ? 'TODAY' : selectedPeriod === '30days' ? 'LAST 30 DAYS' : selectedPeriod === 'custom' ? 'CUSTOM RANGE' : 'LAST 7 DAYS' }}
         </h3>
       </div>
       <div class="chart-wrap">

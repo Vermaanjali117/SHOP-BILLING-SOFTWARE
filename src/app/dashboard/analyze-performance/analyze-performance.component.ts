@@ -21,13 +21,15 @@ import { AgGridModule } from 'ag-grid-angular';
   styleUrls: ['./analyze-performance.component.css'],
 })
 export class AnalyzePerformanceComponent implements OnInit {
-  selectedPeriod: 'today' | '7days' | '30days' = '7days';
+  selectedPeriod: 'today' | '7days' | '30days' | 'custom' = '7days';
   totalRevenue: number = 0;
   totalOrders: number = 0;
   totalConsumption: number = 0;
   consumptionList: any[] = [];
   fromDate?: string;
   toDate?: string;
+  customFrom: string = '';
+  customTo: string = '';
   salesSummary: any = [];
   revenueSeries: Array<{ label: string; value: number }> = [];
   paymentSeries: Array<{ name: string; value: number }> = [];
@@ -43,6 +45,13 @@ export class AnalyzePerformanceComponent implements OnInit {
     private sharedSvc: SharedService,
   ) {}
 
+  formatDateISO(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   getPaymentPct(mode: 'Cash' | 'UPI' | 'Card'): number {
     const total = this.paymentStats.total || (this.paymentStats.cash + this.paymentStats.upi + this.paymentStats.card);
     if (!total || total === 0) return 0;
@@ -54,10 +63,10 @@ export class AnalyzePerformanceComponent implements OnInit {
     this.setPeriod('7days');
   }
 
-  setPeriod(period: 'today' | '7days' | '30days') {
+  setPeriod(period: 'today' | '7days' | '30days' | 'custom') {
     this.selectedPeriod = period;
     const now = new Date();
-    const toStr = now.toISOString().split('T')[0];
+    const toStr = this.formatDateISO(now);
     let fromDateObj = new Date();
 
     if (period === 'today') {
@@ -68,9 +77,46 @@ export class AnalyzePerformanceComponent implements OnInit {
       fromDateObj.setDate(now.getDate() - 29);
     }
 
-    this.fromDate = fromDateObj.toISOString().split('T')[0];
+    this.fromDate = this.formatDateISO(fromDateObj);
     this.toDate = toStr;
+    this.customFrom = this.fromDate;
+    this.customTo = this.toDate;
     this.loadDashboardData(this.fromDate, this.toDate);
+  }
+
+  applyCustomDate() {
+    if (!this.customFrom || !this.customTo) return;
+    if (this.customFrom > this.customTo) {
+      const temp = this.customFrom;
+      this.customFrom = this.customTo;
+      this.customTo = temp;
+    }
+    this.selectedPeriod = 'custom';
+    this.fromDate = this.customFrom;
+    this.toDate = this.customTo;
+    this.loadDashboardData(this.fromDate, this.toDate);
+  }
+
+  openPickerByRef(input: HTMLInputElement) {
+    try {
+      input?.showPicker();
+    } catch (e) {
+      input?.focus();
+    }
+  }
+
+  openDatePicker(event: any) {
+    try {
+      if (event?.target?.showPicker) {
+        event.target.showPicker();
+      }
+    } catch (e) {
+      // Fallback
+    }
+  }
+
+  resetFilter() {
+    this.setPeriod('7days');
   }
 
   loadDashboardData(from?: string, to?: string) {
@@ -140,8 +186,10 @@ export class AnalyzePerformanceComponent implements OnInit {
       }));
     }
 
-    const start = new Date(from);
-    const end = new Date(to);
+    const partsStart = from.split('-').map(Number);
+    const partsEnd = to.split('-').map(Number);
+    const start = new Date(partsStart[0], partsStart[1] - 1, partsStart[2]);
+    const end = new Date(partsEnd[0], partsEnd[1] - 1, partsEnd[2]);
     const days: Array<{ label: string; value: number }> = [];
 
     const salesMap = new Map<string, number>();
@@ -150,8 +198,11 @@ export class AnalyzePerformanceComponent implements OnInit {
     });
 
     const curr = new Date(start);
-    while (curr <= end) {
-      const dateStr = curr.toISOString().split('T')[0];
+    while (curr <= end && days.length < 366) {
+      const y = curr.getFullYear();
+      const m = String(curr.getMonth() + 1).padStart(2, '0');
+      const d = String(curr.getDate()).padStart(2, '0');
+      const dateStr = `${y}-${m}-${d}`;
       const dayNum = String(curr.getDate());
       days.push({
         label: dayNum,
