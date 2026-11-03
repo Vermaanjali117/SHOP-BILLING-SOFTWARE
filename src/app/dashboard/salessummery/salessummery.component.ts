@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SharedService } from '../../../Shared/shared.service';
 import { LoaderService } from '../../../Shared/loader.service';
+import { ExcelExportService } from '../../../Shared/excel-export.service';
 import * as echarts from 'echarts';
 
 @Component({
@@ -23,6 +24,7 @@ export class SalessummeryComponent implements OnInit, AfterViewInit, OnDestroy {
   totalsale: any = [];
   ordercount: any = [];
   chartdata: any = [];
+  paymentBreakdown: any = [];
 
   // Filter State
   selectedPreset: 'all' | 'today' | '7days' | '30days' | 'thisMonth' | 'custom' =
@@ -41,6 +43,7 @@ export class SalessummeryComponent implements OnInit, AfterViewInit, OnDestroy {
     private service: SharedService,
     private el: ElementRef,
     private loader: LoaderService,
+    private excelExportService: ExcelExportService,
   ) {}
 
   ngOnInit(): void {
@@ -137,6 +140,7 @@ export class SalessummeryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.service.getsalessummery(from, to).subscribe({
       next: (res: any) => {
         this.chartdata = res.sales || [];
+        this.paymentBreakdown = res.paymentBreakdown || [];
         this.date = [];
         this.totalsale = [];
         this.ordercount = [];
@@ -155,6 +159,20 @@ export class SalessummeryComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loader.hide();
       },
     });
+  }
+
+  exportSummaryToExcel() {
+    if (!this.chartdata || this.chartdata.length === 0) {
+      alert('No sales summary data available to export');
+      return;
+    }
+    this.excelExportService.exportSalesSummary(
+      this.chartdata,
+      this.paymentBreakdown,
+      this.selectedPreset,
+      this.customFrom,
+      this.customTo,
+    );
   }
 
   getchartdata() {

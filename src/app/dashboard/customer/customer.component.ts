@@ -5,6 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoaderService } from '../../../Shared/loader.service';
+import { ExcelExportService } from '../../../Shared/excel-export.service';
+
 @Component({
   selector: 'app-customer',
   templateUrl: './customer.component.html',
@@ -32,6 +34,14 @@ export class CustomerComponent implements OnInit {
   searchTerm: string = '';
   selectedPaymentFilter: string = 'All';
 
+  // Date Filter State
+  selectedDatePreset: 'all' | 'today' | '7days' | '30days' | 'thisMonth' | 'custom' = 'all';
+  customFrom: string = '';
+  customTo: string = '';
+
+  // Export State
+  showExportDropdown: boolean = false;
+
   defaultColDef: any = {
     resizable: true,
     sortable: true,
@@ -41,6 +51,7 @@ export class CustomerComponent implements OnInit {
     public service: SharedService,
     public loader: LoaderService,
     public toast: ToastrService,
+    public excelExportService: ExcelExportService,
   ) { }
   columnDefs: any;
   orderlist: any = [];
@@ -73,14 +84,53 @@ export class CustomerComponent implements OnInit {
   applyFilter() {
     let filtered = [...this.orderlist];
 
-    // Filter by Payment Mode
+    // 1. Filter by Date Preset or Custom Date Range
+    if (this.selectedDatePreset !== 'all') {
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+      const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+      if (this.selectedDatePreset === 'today') {
+        filtered = filtered.filter((order: any) => {
+          const d = new Date(order.date || order.createdAt);
+          return d >= todayStart && d <= todayEnd;
+        });
+      } else if (this.selectedDatePreset === '7days') {
+        const past7Days = new Date(todayStart.getTime() - 6 * 24 * 60 * 60 * 1000);
+        filtered = filtered.filter((order: any) => {
+          const d = new Date(order.date || order.createdAt);
+          return d >= past7Days && d <= todayEnd;
+        });
+      } else if (this.selectedDatePreset === '30days') {
+        const past30Days = new Date(todayStart.getTime() - 29 * 24 * 60 * 60 * 1000);
+        filtered = filtered.filter((order: any) => {
+          const d = new Date(order.date || order.createdAt);
+          return d >= past30Days && d <= todayEnd;
+        });
+      } else if (this.selectedDatePreset === 'thisMonth') {
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        filtered = filtered.filter((order: any) => {
+          const d = new Date(order.date || order.createdAt);
+          return d >= monthStart && d <= todayEnd;
+        });
+      } else if (this.selectedDatePreset === 'custom' && this.customFrom && this.customTo) {
+        const fromD = new Date(this.customFrom + 'T00:00:00');
+        const toD = new Date(this.customTo + 'T23:59:59.999');
+        filtered = filtered.filter((order: any) => {
+          const d = new Date(order.date || order.createdAt);
+          return d >= fromD && d <= toD;
+        });
+      }
+    }
+
+    // 2. Filter by Payment Mode
     if (this.selectedPaymentFilter && this.selectedPaymentFilter !== 'All') {
       filtered = filtered.filter(
         (o) => (o.paymentMode || '').toLowerCase() === this.selectedPaymentFilter.toLowerCase()
       );
     }
 
-    // Filter by Search Query
+    // 3. Filter by Search Query
     if (this.searchTerm && this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase().trim();
       filtered = filtered.filter((order: any) => {
@@ -123,6 +173,50 @@ export class CustomerComponent implements OnInit {
     }
   }
 
+  setDatePreset(preset: 'all' | 'today' | '7days' | '30days' | 'thisMonth') {
+    this.loader.show();
+    this.selectedDatePreset = preset;
+    this.customFrom = '';
+    this.customTo = '';
+    this.applyFilter();
+    setTimeout(() => this.loader.hide(), 180);
+  }
+
+  applyCustomFilter() {
+    if (this.customFrom && this.customTo) {
+      this.loader.show();
+      this.selectedDatePreset = 'custom';
+      this.applyFilter();
+      setTimeout(() => this.loader.hide(), 180);
+    }
+  }
+
+  resetDateFilter() {
+    this.selectedDatePreset = 'all';
+    this.customFrom = '';
+    this.customTo = '';
+    this.applyFilter();
+  }
+
+  openDatePicker(event: MouseEvent) {
+    const input = event.target as HTMLInputElement;
+    if (input && typeof input.showPicker === 'function') {
+      try {
+        input.showPicker();
+      } catch (err) {}
+    }
+  }
+
+  openPickerByRef(input: HTMLInputElement) {
+    if (input && typeof input.showPicker === 'function') {
+      try {
+        input.showPicker();
+      } catch (err) {}
+    } else if (input) {
+      input.focus();
+    }
+  }
+
   getPaymentCount(mode: string): number {
     if (!this.orderlist || !this.orderlist.length) return 0;
     return this.orderlist.filter(
@@ -138,7 +232,39 @@ export class CustomerComponent implements OnInit {
   clearSearch() {
     this.searchTerm = '';
     this.selectedPaymentFilter = 'All';
+    this.selectedDatePreset = 'all';
+    this.customFrom = '';
+    this.customTo = '';
     this.applyFilter();
+  }
+
+  toggleExportDropdown() {
+    this.showExportDropdown = !this.showExportDropdown;
+  }
+
+  exportSalesToExcel(mode: 'filtered' | 'all' = 'filtered') {
+    const listToExport = mode === 'all' ? this.orderlist : this.rowData;
+    if (!listToExport || listToExport.length === 0) {
+      this.toast.warning('No sales records to export');
+      return;
+    }
+
+    let filterLabel = 'All_Sales';
+    if (mode === 'filtered') {
+      if (this.selectedDatePreset !== 'all') {
+        filterLabel = `Sales_${this.selectedDatePreset}`;
+      } else if (this.selectedPaymentFilter !== 'All') {
+        filterLabel = `Sales_${this.selectedPaymentFilter}`;
+      } else {
+        filterLabel = `Sales_Export`;
+      }
+    } else {
+      filterLabel = `All_Sales`;
+    }
+
+    this.excelExportService.exportSalesOrders(listToExport, filterLabel);
+    this.toast.success(`Exported ${listToExport.length} sales records to Excel!`);
+    this.showExportDropdown = false;
   }
 
   getorderlist() {
