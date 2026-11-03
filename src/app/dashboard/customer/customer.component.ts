@@ -42,6 +42,10 @@ export class CustomerComponent implements OnInit {
   // Export State
   showExportDropdown: boolean = false;
 
+  get hasExportData(): boolean {
+    return (this.orderlist?.length ?? 0) > 0;
+  }
+
   defaultColDef: any = {
     resizable: true,
     sortable: true,
@@ -239,6 +243,10 @@ export class CustomerComponent implements OnInit {
   }
 
   toggleExportDropdown() {
+    if (!this.hasExportData) {
+      this.toast.warning('No sales records to export');
+      return;
+    }
     this.showExportDropdown = !this.showExportDropdown;
   }
 
@@ -246,6 +254,7 @@ export class CustomerComponent implements OnInit {
     const listToExport = mode === 'all' ? this.orderlist : this.rowData;
     if (!listToExport || listToExport.length === 0) {
       this.toast.warning('No sales records to export');
+      this.showExportDropdown = false;
       return;
     }
 

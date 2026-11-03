@@ -168,9 +168,9 @@
     </div>
 
     <!-- RIGHT: SEARCH BOX, RESET & EXCEL EXPORT BUTTON -->
-    <div class="flex items-center gap-2 flex-shrink-0">
+    <div class="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end min-w-0">
       <!-- Search Input -->
-      <div class="relative w-36 sm:w-48">
+      <div class="relative w-36 sm:w-48 min-w-0">
         <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#9A7B56]">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -228,7 +228,7 @@
 
         <!-- Dropdown Menu -->
         <div
-          *ngIf="showExportDropdown"
+          *ngIf="showExportDropdown && hasExportData"
           class="absolute right-0 mt-1 w-56 bg-white border border-[#E8DEC9] rounded-xl shadow-lg z-50 py-1.5 text-xs font-sans"
         >
           <div class="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
